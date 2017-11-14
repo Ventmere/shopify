@@ -4,6 +4,7 @@ version = "0.1.0"
 authors = ["fluxxu <fluxxu@gmail.com>"]
 description = "Shopify API Client for Rust."
 license = "MIT"
+repository = "https://github.com/Ventmere/shopify"
 
 [dependencies]
 chrono = { version = "0.4.0", features = ["serde"] }
