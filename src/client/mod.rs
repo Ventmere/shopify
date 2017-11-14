@@ -7,6 +7,7 @@ use serde::Deserialize;
 mod types;
 pub use self::types::*;
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! shopify_wrap {
   (
@@ -29,7 +30,7 @@ macro_rules! shopify_wrap {
   }
 }
 
-pub trait AsQueryValue {
+pub(crate) trait AsQueryValue {
   fn as_query_value(&self) -> String;
 }
 
@@ -72,6 +73,7 @@ where
   }
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! request_query {
   (

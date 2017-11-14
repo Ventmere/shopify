@@ -1,6 +1,6 @@
 [package]
 name = "shopify"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["fluxxu <fluxxu@gmail.com>"]
 description = "Shopify API Client for Rust."
 license = "MIT"

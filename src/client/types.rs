@@ -1,7 +1,9 @@
+#[doc(hidden)]
 pub trait ShopifyWarpper<T> {
   fn into_inner(self) -> T;
 }
 
+#[doc(hidden)]
 pub trait ShopifyRequestQuery {
   fn as_query_pairs(&self) -> Vec<(String, String)>;
 }

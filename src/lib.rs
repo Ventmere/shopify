@@ -17,6 +17,6 @@ pub mod error;
 pub mod client;
 mod types;
 
-mod shop;
-mod order;
-mod fulfillment_service;
+pub mod shop;
+pub mod order;
+pub mod fulfillment_service;
