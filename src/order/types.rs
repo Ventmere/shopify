@@ -25,6 +25,7 @@ pub enum ShipmentStatus {
   Confirmed,
   InTransit,
   OutForDelivery,
+  AttemptedDelivery,
   Delivered,
   Failure,
 }
