@@ -147,7 +147,7 @@ impl<'a> OrderApi<'a> {
 mod tests {
   use super::*;
 
-  const TMP_DIR: &'static str = "./tmp/ca";
+  const TMP_DIR: &'static str = "./tmp/ventray";
 
   #[test]
   #[ignore]
@@ -194,7 +194,7 @@ mod tests {
   }
 
   #[test]
-  #[ignore]
+  // #[ignore]
   fn test_deserialize_all() {
     use std::io;
     use std::io::Write;
