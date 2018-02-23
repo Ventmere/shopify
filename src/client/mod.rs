@@ -1,4 +1,4 @@
-use reqwest::{Client as HttpClient, RequestBuilder, Url, StatusCode};
+use reqwest::{Client as HttpClient, RequestBuilder, StatusCode, Url};
 use types::{DateTime, Utc};
 use error::*;
 pub use reqwest::Method;
@@ -171,9 +171,7 @@ impl Client {
       }
 
       let body = res.text()?;
-      return Err(
-        ErrorKind::Request(path.to_owned(), res.status(), body).into(),
-      );
+      return Err(ErrorKind::Request(path.to_owned(), res.status(), body).into());
     }
 
     res.json().chain_err(|| ErrorKind::InvalidResponse)

@@ -150,7 +150,6 @@ mod tests {
   const TMP_DIR: &'static str = "./tmp/ventray";
 
   #[test]
-  #[ignore]
   fn test_dump_all_orders() {
     use std::fs::File;
     use std::io::Write;
