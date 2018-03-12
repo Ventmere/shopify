@@ -1,6 +1,5 @@
 use error::*;
 use client::{Client, Method};
-use types::Value;
 use serde::Serialize;
 
 mod types;
@@ -29,7 +28,7 @@ impl<'a> ProductVariantApi<'a> {
   pub fn get_list(&self, params: &GetVariantListParams) -> Result<Vec<Variant>> {
     shopify_wrap! {
       pub struct Res {
-        varaints: Vec<Variant>,
+        variants: Vec<Variant>,
       }
     }
 
@@ -43,7 +42,7 @@ impl<'a> ProductVariantApi<'a> {
   pub fn update<V: Serialize>(&self, id: i64, value: V) -> Result<Variant> {
     shopify_wrap! {
       pub struct Res {
-        varaint: Variant,
+        variant: Variant,
       }
     }
 
@@ -63,6 +62,14 @@ mod tests {
   use super::*;
 
   const TMP_DIR: &'static str = "./tmp/variants";
+
+  #[test]
+  fn test_get_variant_list() {
+    let client = ::client::get_test_client();
+    let mut params = GetVariantListParams::default();
+    params.limit = Some(250);
+    client.product_variant().get_list(&params).unwrap();
+  }
 
   #[test]
   fn test_dump_all_variants() {
