@@ -1,31 +1,43 @@
-use error::*;
 use client::{Client, Method};
+use result::*;
 
 mod types;
 pub use self::types::*;
 
-pub struct FulfillmentServiceApi<'a> {
-  client: &'a Client,
-}
-
-impl Client {
-  pub fn fulfillment_service(&self) -> FulfillmentServiceApi {
-    FulfillmentServiceApi { client: self }
-  }
-}
-
-impl<'a> FulfillmentServiceApi<'a> {
-  pub fn get_list(
+pub trait FulfillmentServiceApi {
+  fn get_list(
     &self,
     scope: Option<FulfillmentServiceScope>,
-  ) -> Result<Vec<FulfillmentService>> {
+  ) -> ShopifyResult<Vec<FulfillmentService>>;
+
+  fn create(
+    &self,
+    fulfillment_service: &NewFulfillmentService,
+  ) -> ShopifyResult<FulfillmentService>;
+
+  fn get(&self, id: i64) -> ShopifyResult<FulfillmentService>;
+
+  fn update(
+    &self,
+    id: i64,
+    fulfillment_service: &UpdatetFulfillmentService,
+  ) -> ShopifyResult<FulfillmentService>;
+
+  fn delete(&self, id: i64) -> ShopifyResult<()>;
+}
+
+impl FulfillmentServiceApi for Client {
+  fn get_list(
+    &self,
+    scope: Option<FulfillmentServiceScope>,
+  ) -> ShopifyResult<Vec<FulfillmentService>> {
     shopify_wrap! {
       pub struct Res {
         fulfillment_services: Vec<FulfillmentService>,
       }
     }
 
-    let res: Res = self.client.request_with_params(
+    let res: Res = self.request_with_params(
       Method::Get,
       "/admin/fulfillment_services.json",
       &scope.map(|scope| ("scope", scope)),
@@ -34,52 +46,51 @@ impl<'a> FulfillmentServiceApi<'a> {
     Ok(res.into_inner())
   }
 
-  pub fn create(&self, fulfillment_service: &NewFulfillmentService) -> Result<FulfillmentService> {
+  fn create(
+    &self,
+    fulfillment_service: &NewFulfillmentService,
+  ) -> ShopifyResult<FulfillmentService> {
     shopify_wrap! {
       pub struct Res {
         fulfillment_service: FulfillmentService,
       }
     }
     let path = "/admin/fulfillment_services.json";
-    let res: Res = self.client.request(Method::Post, &path, move |b| {
-      b.json(&json!({
-        "fulfillment_service": fulfillment_service
-      }));
+    let res: Res = self.request(Method::Post, &path, move |b| {
+      b.json(&json!({ "fulfillment_service": fulfillment_service }));
     })?;
     Ok(res.into_inner())
   }
 
-  pub fn get(&self, id: i64) -> Result<FulfillmentService> {
+  fn get(&self, id: i64) -> ShopifyResult<FulfillmentService> {
     shopify_wrap! {
       pub struct Res {
         fulfillment_service: FulfillmentService,
       }
     }
     let path = format!("/admin/fulfillment_services/{}.json", id);
-    let res: Res = self.client.request(Method::Get, &path, move |_| {})?;
+    let res: Res = self.request(Method::Get, &path, move |_| {})?;
     Ok(res.into_inner())
   }
 
-  pub fn update(
+  fn update(
     &self,
     id: i64,
     fulfillment_service: &UpdatetFulfillmentService,
-  ) -> Result<FulfillmentService> {
+  ) -> ShopifyResult<FulfillmentService> {
     shopify_wrap! {
       pub struct Res {
         fulfillment_service: FulfillmentService,
       }
     }
     let path = format!("/admin/fulfillment_services/{}.json", id);
-    let res: Res = self.client.request(Method::Put, &path, move |b| {
-      b.json(&json!({
-        "fulfillment_service": fulfillment_service
-      }));
+    let res: Res = self.request(Method::Put, &path, move |b| {
+      b.json(&json!({ "fulfillment_service": fulfillment_service }));
     })?;
     Ok(res.into_inner())
   }
 
-  pub fn delete(&self, id: i64) -> Result<()> {
+  fn delete(&self, id: i64) -> ShopifyResult<()> {
     use serde_json::Value;
     shopify_wrap! {
       pub struct Res {
@@ -87,11 +98,7 @@ impl<'a> FulfillmentServiceApi<'a> {
       }
     }
     let path = format!("/admin/fulfillment_services/{}.json", id);
-    self.client.request::<Value, _>(
-      Method::Delete,
-      &path,
-      |_| {},
-    )?;
+    self.request::<Value, _>(Method::Delete, &path, |_| {})?;
     Ok(())
   }
 }
@@ -104,10 +111,7 @@ mod tests {
   #[ignore]
   fn test_fulfillment_service_get_list() {
     let client = ::client::get_test_client();
-    let service = client
-      .fulfillment_service()
-      .get_list(Some(FulfillmentServiceScope::All))
-      .unwrap();
+    let service = client.get_list(Some(FulfillmentServiceScope::All)).unwrap();
     println!("{:#?}", service);
   }
 
@@ -115,7 +119,7 @@ mod tests {
   #[ignore]
   fn test_fulfillment_service_get_one() {
     let client = ::client::get_test_client();
-    let service = client.fulfillment_service().get(191681).unwrap();
+    let service = client.get(191681).unwrap();
     println!("{:#?}", service);
   }
 
@@ -124,7 +128,6 @@ mod tests {
   fn test_fulfillment_service_create() {
     let client = ::client::get_test_client();
     let service = client
-      .fulfillment_service()
       .create(&NewFulfillmentService {
         name: "S2".to_owned(),
         callback_url: "https://requestb.in/1gnver61".to_owned(),
@@ -132,8 +135,7 @@ mod tests {
         tracking_support: true,
         requires_shipping_method: true,
         format: "json".to_owned(),
-      })
-      .unwrap();
+      }).unwrap();
     println!("{:#?}", service);
   }
 
@@ -143,10 +145,7 @@ mod tests {
     let client = ::client::get_test_client();
     let mut update = UpdatetFulfillmentService::default();
     update.name = Some("Ventmere S2".to_owned());
-    let service = client
-      .fulfillment_service()
-      .update(13008909, &update)
-      .unwrap();
+    let service = client.update(13008909, &update).unwrap();
     println!("{:#?}", service);
   }
 
@@ -154,10 +153,6 @@ mod tests {
   #[ignore]
   fn test_fulfillment_service_delete() {
     let client = ::client::get_test_client();
-    client
-      .fulfillment_service()
-      .delete(12976141)
-      .optional()
-      .unwrap();
+    client.delete(12976141).optional().unwrap();
   }
 }

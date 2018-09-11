@@ -1,8 +1,8 @@
-use reqwest::{Client as HttpClient, RequestBuilder, StatusCode, Url};
-use types::{DateTime, Utc};
-use error::*;
 pub use reqwest::Method;
+use reqwest::{Client as HttpClient, RequestBuilder, StatusCode, Url};
+use result::*;
 use serde::Deserialize;
+use types::{DateTime, Utc};
 
 mod types;
 pub use self::types::*;
@@ -27,7 +27,7 @@ macro_rules! shopify_wrap {
         self.$key
       }
     }
-  }
+  };
 }
 
 pub(crate) trait AsQueryValue {
@@ -37,23 +37,23 @@ pub(crate) trait AsQueryValue {
 macro_rules! impl_into_query_value {
   (
     $t:ty
-  ) => (
+  ) => {
     impl AsQueryValue for $t {
       fn as_query_value(&self) -> String {
         format!("{}", self)
       }
     }
-  );
+  };
 
   (
     $t:ty, $f:expr
-  ) => (
+  ) => {
     impl AsQueryValue for $t {
       fn as_query_value(&self) -> String {
         $f(self)
       }
     }
-  );
+  };
 }
 
 impl_into_query_value!(i64);
@@ -121,7 +121,7 @@ pub struct Client {
 }
 
 impl Client {
-  pub fn new(base_url: &str, api_key: &str, password: &str) -> Result<Self> {
+  pub fn new(base_url: &str, api_key: &str, password: &str) -> ShopifyResult<Self> {
     Ok(Client {
       base_url: Url::parse(base_url)?,
       api_key: api_key.to_owned(),
@@ -135,7 +135,7 @@ impl Client {
     base_url: &str,
     api_key: &str,
     password: &str,
-  ) -> Result<Self> {
+  ) -> ShopifyResult<Self> {
     Ok(Client {
       base_url: Url::parse(base_url)?,
       api_key: api_key.to_owned(),
@@ -150,7 +150,7 @@ impl Client {
     path: &str,
     params: &P,
     bf: F,
-  ) -> Result<T>
+  ) -> ShopifyResult<T>
   where
     P: ShopifyRequestQuery,
     T: for<'de> Deserialize<'de>,
@@ -167,17 +167,21 @@ impl Client {
 
     if !res.status().is_success() {
       if res.status() == StatusCode::NotFound {
-        return Err(ErrorKind::NotFound.into());
+        return Err(ShopifyError::NotFound);
       }
 
       let body = res.text()?;
-      return Err(ErrorKind::Request(path.to_owned(), res.status(), body).into());
+      return Err(ShopifyError::Request {
+        path: path.to_owned(),
+        status: res.status(),
+        body,
+      });
     }
 
-    res.json().chain_err(|| ErrorKind::InvalidResponse)
+    res.json().map_err(Into::into)
   }
 
-  pub fn request<T, F>(&self, method: Method, path: &str, bf: F) -> Result<T>
+  pub fn request<T, F>(&self, method: Method, path: &str, bf: F) -> ShopifyResult<T>
   where
     T: for<'de> Deserialize<'de>,
     F: FnOnce(&mut RequestBuilder),

@@ -18,7 +18,7 @@ pub struct Variant {
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
   pub taxable: bool,
-  pub barcode: String,
+  pub barcode: Option<String>,
   pub grams: i64,
   pub image_id: Option<i64>,
   pub inventory_quantity: i64,

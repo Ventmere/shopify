@@ -64,7 +64,7 @@ pub struct Shop {
   /// The shop's normalized province or state name.
   province: String,
   /// The two-letter code for the shop's province or state.
-  province_code: String,
+  province_code: Option<String>,
   /// The username of the shop owner.
   shop_owner: String,
   source: Option<String>,

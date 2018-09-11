@@ -1,21 +1,11 @@
-use error::*;
 use client::{Client, Method};
+use result::*;
 use types::{DateTime, Utc};
 
 mod types;
 pub use self::types::*;
 mod fulfillment;
 pub use self::fulfillment::NewFulfillment;
-
-pub struct OrderApi<'a> {
-  client: &'a Client,
-}
-
-impl Client {
-  pub fn order(&self) -> OrderApi {
-    OrderApi { client: self }
-  }
-}
 
 request_query! {
   pub struct GetOrderListParams {
@@ -37,48 +27,64 @@ request_query! {
   }
 }
 
-impl<'a> OrderApi<'a> {
-  pub fn get_list(&self, params: &GetOrderListParams) -> Result<Vec<Order>> {
+pub trait OrderApi {
+  fn get_list(&self, params: &GetOrderListParams) -> ShopifyResult<Vec<Order>>;
+
+  fn create_fulfillment(
+    &self,
+    order_id: i64,
+    fulfillment: NewFulfillment,
+  ) -> ShopifyResult<Fulfillment>;
+
+  fn update_fulfillment(
+    &self,
+    order_id: i64,
+    fulfillment_id: i64,
+    fulfillment: NewFulfillment,
+  ) -> ShopifyResult<Fulfillment>;
+
+  fn complete_fulfillment(&self, order_id: i64, fulfillment_id: i64) -> ShopifyResult<Fulfillment>;
+
+  fn open_fulfillment(&self, order_id: i64, fulfillment_id: i64) -> ShopifyResult<Fulfillment>;
+
+  fn cancel_fulfillment(&self, order_id: i64, fulfillment_id: i64) -> ShopifyResult<Fulfillment>;
+}
+
+impl OrderApi for Client {
+  fn get_list(&self, params: &GetOrderListParams) -> ShopifyResult<Vec<Order>> {
     shopify_wrap! {
       pub struct Res {
         orders: Vec<Order>,
       }
     }
 
-    let res: Res = self.client.request_with_params(
-      Method::Get,
-      "/admin/orders.json",
-      params,
-      |_| {},
-    )?;
+    let res: Res = self.request_with_params(Method::Get, "/admin/orders.json", params, |_| {})?;
     Ok(res.into_inner())
   }
 
-  pub fn create_fulfillment(
+  fn create_fulfillment(
     &self,
     order_id: i64,
     fulfillment: NewFulfillment,
-  ) -> Result<Fulfillment> {
+  ) -> ShopifyResult<Fulfillment> {
     shopify_wrap! {
       pub struct Res {
         fulfillment: Fulfillment,
       }
     }
     let path = format!("/admin/orders/{}/fulfillments.json", order_id);
-    let res: Res = self.client.request(Method::Post, &path, move |b| {
-      b.json(&json!({
-        "fulfillment": fulfillment
-      }));
+    let res: Res = self.request(Method::Post, &path, move |b| {
+      b.json(&json!({ "fulfillment": fulfillment }));
     })?;
     Ok(res.into_inner())
   }
 
-  pub fn update_fulfillment(
+  fn update_fulfillment(
     &self,
     order_id: i64,
     fulfillment_id: i64,
     fulfillment: NewFulfillment,
-  ) -> Result<Fulfillment> {
+  ) -> ShopifyResult<Fulfillment> {
     shopify_wrap! {
       pub struct Res {
         fulfillment: Fulfillment,
@@ -89,15 +95,13 @@ impl<'a> OrderApi<'a> {
       order_id = order_id,
       fulfillment_id = fulfillment_id
     );
-    let res: Res = self.client.request(Method::Put, &path, move |b| {
-      b.json(&json!({
-        "fulfillment": fulfillment
-      }));
+    let res: Res = self.request(Method::Put, &path, move |b| {
+      b.json(&json!({ "fulfillment": fulfillment }));
     })?;
     Ok(res.into_inner())
   }
 
-  pub fn complete_fulfillment(&self, order_id: i64, fulfillment_id: i64) -> Result<Fulfillment> {
+  fn complete_fulfillment(&self, order_id: i64, fulfillment_id: i64) -> ShopifyResult<Fulfillment> {
     shopify_wrap! {
       pub struct Res {
         fulfillment: Fulfillment,
@@ -108,11 +112,11 @@ impl<'a> OrderApi<'a> {
       order_id = order_id,
       fulfillment_id = fulfillment_id
     );
-    let res: Res = self.client.request(Method::Post, &path, |_| {})?;
+    let res: Res = self.request(Method::Post, &path, |_| {})?;
     Ok(res.into_inner())
   }
 
-  pub fn open_fulfillment(&self, order_id: i64, fulfillment_id: i64) -> Result<Fulfillment> {
+  fn open_fulfillment(&self, order_id: i64, fulfillment_id: i64) -> ShopifyResult<Fulfillment> {
     shopify_wrap! {
       pub struct Res {
         fulfillment: Fulfillment,
@@ -123,11 +127,11 @@ impl<'a> OrderApi<'a> {
       order_id = order_id,
       fulfillment_id = fulfillment_id
     );
-    let res: Res = self.client.request(Method::Post, &path, |_| {})?;
+    let res: Res = self.request(Method::Post, &path, |_| {})?;
     Ok(res.into_inner())
   }
 
-  pub fn cancel_fulfillment(&self, order_id: i64, fulfillment_id: i64) -> Result<Fulfillment> {
+  fn cancel_fulfillment(&self, order_id: i64, fulfillment_id: i64) -> ShopifyResult<Fulfillment> {
     shopify_wrap! {
       pub struct Res {
         fulfillment: Fulfillment,
@@ -138,7 +142,7 @@ impl<'a> OrderApi<'a> {
       order_id = order_id,
       fulfillment_id = fulfillment_id
     );
-    let res: Res = self.client.request(Method::Post, &path, |_| {})?;
+    let res: Res = self.request(Method::Post, &path, |_| {})?;
     Ok(res.into_inner())
   }
 }
@@ -151,10 +155,10 @@ mod tests {
 
   #[test]
   fn test_dump_all_orders() {
+    use chrono::TimeZone;
+    use serde_json::{self, Value};
     use std::fs::File;
     use std::io::Write;
-    use serde_json::{self, Value};
-    use chrono::TimeZone;
 
     shopify_wrap! {
       pub struct RawOrders {
@@ -195,10 +199,10 @@ mod tests {
   #[test]
   // #[ignore]
   fn test_deserialize_all() {
+    use serde_json::{self, Value};
+    use std::fs;
     use std::io;
     use std::io::Write;
-    use std::fs;
-    use serde_json::{self, Value};
 
     let mut chunk = 1;
     loop {
@@ -234,18 +238,16 @@ mod tests {
     let client = ::client::get_test_client();
     let mut f = NewFulfillment::new();
     f.add_item(59878440973, Some(1)).tracking_number("7777");
-    client.order().create_fulfillment(33673216013, f).unwrap();
+    client.create_fulfillment(33673216013, f).unwrap();
   }
 
   #[test]
   fn test_update_fulfillment() {
     let client = ::client::get_test_client();
     let mut f = NewFulfillment::new();
-    f.add_item(59878440973, Some(1)).tracking_number(
-      "1Z30434EDG37750543",
-    );
+    f.add_item(59878440973, Some(1))
+      .tracking_number("1Z30434EDG37750543");
     client
-      .order()
       .update_fulfillment(33673216013, 34429861901, f)
       .unwrap();
   }

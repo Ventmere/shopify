@@ -1,18 +1,8 @@
-use error::*;
 use client::{Client, Method};
+use result::*;
 
 mod types;
 pub use self::types::*;
-
-pub struct ShopApi<'a> {
-  client: &'a Client,
-}
-
-impl Client {
-  pub fn shop(&self) -> ShopApi {
-    ShopApi { client: self }
-  }
-}
 
 shopify_wrap! {
   pub struct GetShop {
@@ -20,9 +10,13 @@ shopify_wrap! {
   }
 }
 
-impl<'a> ShopApi<'a> {
-  pub fn get(&self) -> Result<Shop> {
-    let res: GetShop = self.client.request(Method::Get, "/admin/shop.json", |_| {})?;
+pub trait ShopApi {
+  fn get(&self) -> ShopifyResult<Shop>;
+}
+
+impl ShopApi for Client {
+  fn get(&self) -> ShopifyResult<Shop> {
+    let res: GetShop = self.request(Method::Get, "/admin/shop.json", |_| {})?;
     Ok(res.into_inner())
   }
 }
@@ -97,7 +91,7 @@ mod tests {
   #[ignore]
   fn test_get_shop() {
     let client = ::client::get_test_client();
-    let shop = client.shop().get().unwrap();
+    let shop = client.get().unwrap();
     println!("{:#?}", shop);
   }
 }

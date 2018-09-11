@@ -1,19 +1,9 @@
-use error::*;
 use client::{Client, Method};
+use result::*;
 use serde::Serialize;
 
 mod types;
 pub use self::types::*;
-
-pub struct ProductVariantApi<'a> {
-  client: &'a Client,
-}
-
-impl Client {
-  pub fn product_variant(&self) -> ProductVariantApi {
-    ProductVariantApi { client: self }
-  }
-}
 
 request_query! {
   pub struct GetVariantListParams {
@@ -24,22 +14,24 @@ request_query! {
   }
 }
 
-impl<'a> ProductVariantApi<'a> {
-  pub fn get_list(&self, params: &GetVariantListParams) -> Result<Vec<Variant>> {
+pub trait ProductVariantApi {
+  fn get_list(&self, params: &GetVariantListParams) -> ShopifyResult<Vec<Variant>>;
+  fn update<V: Serialize>(&self, id: i64, value: V) -> ShopifyResult<Variant>;
+}
+
+impl ProductVariantApi for Client {
+  fn get_list(&self, params: &GetVariantListParams) -> ShopifyResult<Vec<Variant>> {
     shopify_wrap! {
       pub struct Res {
         variants: Vec<Variant>,
       }
     }
 
-    let res: Res =
-      self
-        .client
-        .request_with_params(Method::Get, "/admin/variants.json", params, |_| {})?;
+    let res: Res = self.request_with_params(Method::Get, "/admin/variants.json", params, |_| {})?;
     Ok(res.into_inner())
   }
 
-  pub fn update<V: Serialize>(&self, id: i64, value: V) -> Result<Variant> {
+  fn update<V: Serialize>(&self, id: i64, value: V) -> ShopifyResult<Variant> {
     shopify_wrap! {
       pub struct Res {
         variant: Variant,
@@ -47,7 +39,7 @@ impl<'a> ProductVariantApi<'a> {
     }
 
     let path = format!("/admin/variants/{}.json", id);
-    let res: Res = self.client.request(Method::Put, &path, move |b| {
+    let res: Res = self.request(Method::Put, &path, move |b| {
       b.json(&json!({
         "variant": value,
       }));
@@ -68,15 +60,13 @@ mod tests {
     let client = ::client::get_test_client();
     let mut params = GetVariantListParams::default();
     params.limit = Some(250);
-    client.product_variant().get_list(&params).unwrap();
+    client.get_list(&params).unwrap();
   }
 
   #[test]
   fn test_dump_all_variants() {
-    use std::fs::File;
-    use std::io::Write;
     use serde_json::{self, Value};
-    use chrono::TimeZone;
+    use std::fs::File;
 
     shopify_wrap! {
       pub struct RawVariants {
@@ -97,8 +87,7 @@ mod tests {
           "/admin/variants.json",
           &params,
           |_| {},
-        )
-        .unwrap()
+        ).unwrap()
         .into_inner();
 
       if variants.is_empty() {
@@ -127,10 +116,10 @@ mod tests {
   #[test]
   // #[ignore]
   fn test_deserialize_all_variants() {
+    use serde_json::{self, Value};
+    use std::fs;
     use std::io;
     use std::io::Write;
-    use std::fs;
-    use serde_json::{self, Value};
 
     let mut chunk = 1;
     loop {

@@ -252,7 +252,7 @@ pub struct ShippingLines {
   pub delivery_category: Value,
   pub carrier_identifier: Value,
   pub discounted_price: String,
-  pub tax_lines: Vec<Value>,
+  pub tax_lines: Vec<TaxLines>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
