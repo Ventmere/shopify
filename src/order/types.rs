@@ -45,7 +45,7 @@ pub struct Address {
   pub latitude: Option<f64>,
   pub longitude: Option<f64>,
   pub name: String,
-  pub country_code: String,
+  pub country_code: Option<String>,
   pub province_code: Option<String>,
 }
 
