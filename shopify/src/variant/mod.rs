@@ -53,7 +53,7 @@ impl ProductVariantApi for Client {
 mod tests {
   use super::*;
 
-  const TMP_DIR: &'static str = "./tmp/variants";
+  const TMP_DIR: &'static str = "../tmp/variants";
 
   #[test]
   fn test_get_variant_list() {
