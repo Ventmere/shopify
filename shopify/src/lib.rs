@@ -18,6 +18,7 @@ pub mod client;
 mod types;
 
 pub mod fulfillment_service;
+pub mod inventory;
 pub mod order;
 pub mod product;
 pub mod shop;

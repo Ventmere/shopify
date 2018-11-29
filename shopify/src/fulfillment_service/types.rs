@@ -25,6 +25,7 @@ pub struct FulfillmentService {
   pub inventory_management: bool,
   pub tracking_support: bool,
   pub provider_id: Option<i64>,
+  pub location_id: i64,
 }
 
 #[derive(Debug, Serialize)]

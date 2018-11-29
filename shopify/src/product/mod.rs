@@ -87,7 +87,8 @@ mod tests {
           "/admin/products.json",
           &params,
           |_| {},
-        ).unwrap()
+        )
+        .unwrap()
         .into_inner();
 
       if products.is_empty() {
@@ -114,7 +115,7 @@ mod tests {
   }
 
   #[test]
-  // #[ignore]
+  #[ignore]
   fn test_deserialize_all_products() {
     use serde_json::{self, Value};
     use std::fs;

@@ -111,7 +111,9 @@ mod tests {
   #[ignore]
   fn test_fulfillment_service_get_list() {
     let client = ::client::get_test_client();
-    let service = client.get_list(Some(FulfillmentServiceScope::All)).unwrap();
+    let service = client
+      .get_list(Some(FulfillmentServiceScope::CurrentClient))
+      .unwrap();
     println!("{:#?}", service);
   }
 
@@ -135,7 +137,8 @@ mod tests {
         tracking_support: true,
         requires_shipping_method: true,
         format: "json".to_owned(),
-      }).unwrap();
+      })
+      .unwrap();
     println!("{:#?}", service);
   }
 
