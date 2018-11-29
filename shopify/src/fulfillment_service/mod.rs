@@ -20,7 +20,7 @@ pub trait FulfillmentServiceApi {
   fn update(
     &self,
     id: i64,
-    fulfillment_service: &UpdatetFulfillmentService,
+    fulfillment_service: &UpdateFulfillmentService,
   ) -> ShopifyResult<FulfillmentService>;
 
   fn delete(&self, id: i64) -> ShopifyResult<()>;
@@ -76,7 +76,7 @@ impl FulfillmentServiceApi for Client {
   fn update(
     &self,
     id: i64,
-    fulfillment_service: &UpdatetFulfillmentService,
+    fulfillment_service: &UpdateFulfillmentService,
   ) -> ShopifyResult<FulfillmentService> {
     shopify_wrap! {
       pub struct Res {
@@ -146,7 +146,7 @@ mod tests {
   #[ignore]
   fn test_fulfillment_service_update() {
     let client = ::client::get_test_client();
-    let mut update = UpdatetFulfillmentService::default();
+    let mut update = UpdateFulfillmentService::default();
     update.name = Some("Ventmere S2".to_owned());
     let service = client.update(13008909, &update).unwrap();
     println!("{:#?}", service);

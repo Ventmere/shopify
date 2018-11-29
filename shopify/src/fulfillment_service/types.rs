@@ -39,7 +39,7 @@ pub struct NewFulfillmentService {
 }
 
 #[derive(Debug, Serialize, Default)]
-pub struct UpdatetFulfillmentService {
+pub struct UpdateFulfillmentService {
   #[serde(skip_serializing_if = "Option::is_none")]
   pub name: Option<String>,
   #[serde(skip_serializing_if = "Option::is_none")]
