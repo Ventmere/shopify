@@ -1,13 +1,13 @@
 use types::{DateTime, Utc, Value};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Copy, Clone, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum FulfillmentStatus {
   Fulfilled,
   Partial,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Copy, Clone, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum FinancialStatus {
   Pending,
@@ -19,7 +19,7 @@ pub enum FinancialStatus {
   Voided,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Copy, Clone, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum ShipmentStatus {
   Confirmed,
