@@ -7,9 +7,7 @@ pub enum ShopifyError {
 
   #[fail(
     display = "request error: path = '{}', status = '{}', body = '{}'",
-    path,
-    status,
-    body
+    path, status, body
   )]
   Request {
     path: String,
@@ -41,6 +39,7 @@ impl ShopifyError {
         // 429 Too Many Requests
         code == 429 || code == 500 || code == 503
       }
+      ShopifyError::Io(_) => true,
       _ => false,
     }
   }
