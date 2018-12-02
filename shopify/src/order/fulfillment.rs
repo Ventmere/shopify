@@ -6,6 +6,7 @@ pub struct NewFulfillment {
   tracking_url: Option<String>,
   notify_customer: Option<bool>,
   line_items: Vec<Item>,
+  location_id: Option<i64>,
 }
 
 #[derive(Debug, Default, Serialize)]
@@ -17,6 +18,11 @@ struct Item {
 impl NewFulfillment {
   pub fn new() -> Self {
     Self::default()
+  }
+
+  pub fn location_id(&mut self, id: i64) -> &mut Self {
+    self.location_id = Some(id);
+    self
   }
 
   pub fn tracking_number<T: Into<String>>(&mut self, value: T) -> &mut Self {
