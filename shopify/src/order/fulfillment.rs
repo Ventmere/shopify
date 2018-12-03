@@ -1,4 +1,4 @@
-#[derive(Debug, Default, Serialize)]
+#[derive(Debug, Default, Serialize, Clone)]
 pub struct NewFulfillment {
   tracking_company: Option<String>,
   tracking_number: Option<String>,
@@ -10,7 +10,7 @@ pub struct NewFulfillment {
   location_id: Option<i64>,
 }
 
-#[derive(Debug, Default, Serialize)]
+#[derive(Debug, Default, Serialize, Clone)]
 struct Item {
   id: i64,
   quantity: Option<i64>,
