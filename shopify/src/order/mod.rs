@@ -33,14 +33,14 @@ pub trait OrderApi {
   fn create_fulfillment(
     &self,
     order_id: i64,
-    fulfillment: NewFulfillment,
+    fulfillment: &NewFulfillment,
   ) -> ShopifyResult<Fulfillment>;
 
   fn update_fulfillment(
     &self,
     order_id: i64,
     fulfillment_id: i64,
-    fulfillment: NewFulfillment,
+    fulfillment: &NewFulfillment,
   ) -> ShopifyResult<Fulfillment>;
 
   fn complete_fulfillment(&self, order_id: i64, fulfillment_id: i64) -> ShopifyResult<Fulfillment>;
@@ -65,7 +65,7 @@ impl OrderApi for Client {
   fn create_fulfillment(
     &self,
     order_id: i64,
-    fulfillment: NewFulfillment,
+    fulfillment: &NewFulfillment,
   ) -> ShopifyResult<Fulfillment> {
     shopify_wrap! {
       pub struct Res {
@@ -83,7 +83,7 @@ impl OrderApi for Client {
     &self,
     order_id: i64,
     fulfillment_id: i64,
-    fulfillment: NewFulfillment,
+    fulfillment: &NewFulfillment,
   ) -> ShopifyResult<Fulfillment> {
     shopify_wrap! {
       pub struct Res {
@@ -238,7 +238,7 @@ mod tests {
     let client = ::client::get_test_client();
     let mut f = NewFulfillment::new();
     f.add_item(59878440973, Some(1)).tracking_number("7777");
-    client.create_fulfillment(33673216013, f).unwrap();
+    client.create_fulfillment(33673216013, &f).unwrap();
   }
 
   #[test]
@@ -248,7 +248,7 @@ mod tests {
     f.add_item(59878440973, Some(1))
       .tracking_number("1Z30434EDG37750543");
     client
-      .update_fulfillment(33673216013, 34429861901, f)
+      .update_fulfillment(33673216013, 34429861901, &f)
       .unwrap();
   }
 }
