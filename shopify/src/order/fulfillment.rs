@@ -4,6 +4,7 @@ pub struct NewFulfillment {
   tracking_number: Option<String>,
   tracking_numbers: Option<Vec<String>>,
   tracking_url: Option<String>,
+  tracking_urls: Option<Vec<String>>,
   notify_customer: Option<bool>,
   line_items: Vec<Item>,
   location_id: Option<i64>,
@@ -49,6 +50,16 @@ impl NewFulfillment {
 
   pub fn tracking_url<T: Into<String>>(&mut self, value: T) -> &mut Self {
     self.tracking_url = Some(value.into());
+    self
+  }
+
+  pub fn tracking_urls<T>(&mut self, values: T) -> &mut Self
+  where
+    T: IntoIterator,
+    <T as IntoIterator>::Item: Into<String>,
+  {
+    self.tracking_url = None;
+    self.tracking_urls = Some(values.into_iter().map(Into::into).collect());
     self
   }
 
