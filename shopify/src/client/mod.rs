@@ -1,4 +1,5 @@
 pub use reqwest::Method;
+use reqwest::Response;
 use reqwest::{Client as HttpClient, RequestBuilder, StatusCode, Url};
 use result::*;
 use serde::Deserialize;
@@ -188,6 +189,19 @@ impl Client {
   {
     self.request_with_params(method, path, &(), bf)
   }
+
+  pub fn request_raw<F>(&self, method: Method, path: &str, bf: F) -> ShopifyResult<Response>
+  where
+    F: FnOnce(&mut RequestBuilder),
+  {
+    let url = self.base_url.join(path)?;
+    let mut b = self.client.request(method, url);
+    b.basic_auth(self.api_key.clone(), Some(self.password.clone()));
+
+    bf(&mut b);
+
+    b.send().map_err(Into::into)
+  }
 }
 
 #[cfg(test)]
@@ -199,5 +213,6 @@ pub fn get_test_client() -> Client {
     &var("SHOPIFY_BASE_URL").unwrap(),
     &var("SHOPIFY_API_KEY").unwrap(),
     &var("SHOPIFY_PASSWORD").unwrap(),
-  ).unwrap()
+  )
+  .unwrap()
 }
