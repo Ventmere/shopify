@@ -5,7 +5,7 @@ use reqwest::Response;
 use serde::Deserialize;
 use url::Url;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct GetPage {
   pub page_info: String,
   pub limit: Option<i64>,
