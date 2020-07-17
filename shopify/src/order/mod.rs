@@ -11,7 +11,6 @@ request_query! {
   pub struct GetOrderListParams {
     pub ids: Option<Vec<i64>>,
     pub limit: Option<i64>,
-    pub page: Option<i64>,
     pub since_id: Option<i64>,
     pub created_at_min: Option<DateTime<Utc>>,
     pub created_at_max: Option<DateTime<Utc>>,

@@ -1,3 +1,4 @@
+use crate::pagination::Paginated;
 pub use reqwest::Method;
 use reqwest::Response;
 use reqwest::{Client as HttpClient, RequestBuilder, StatusCode, Url};
@@ -182,12 +183,62 @@ impl Client {
     res.json().map_err(Into::into)
   }
 
+  pub fn request_with_params_paginated<P, T, F>(
+    &self,
+    method: Method,
+    path: &str,
+    params: &P,
+    bf: F,
+  ) -> ShopifyResult<Paginated<T>>
+  where
+    P: ShopifyRequestQuery,
+    T: for<'de> Deserialize<'de>,
+    F: FnOnce(&mut RequestBuilder),
+  {
+    let mut url = self.base_url.join(path)?;
+    url.query_pairs_mut().extend_pairs(params.as_query_pairs());
+    let mut b = self.client.request(method, url);
+    b.basic_auth(self.api_key.clone(), Some(self.password.clone()));
+
+    bf(&mut b);
+
+    let mut res = b.send()?;
+
+    if !res.status().is_success() {
+      if res.status() == StatusCode::NotFound {
+        return Err(ShopifyError::NotFound);
+      }
+
+      let body = res.text()?;
+      return Err(ShopifyError::Request {
+        path: path.to_owned(),
+        status: res.status(),
+        body,
+      });
+    }
+
+    Ok(Paginated::from_res(&mut res)?)
+  }
+
   pub fn request<T, F>(&self, method: Method, path: &str, bf: F) -> ShopifyResult<T>
   where
     T: for<'de> Deserialize<'de>,
     F: FnOnce(&mut RequestBuilder),
   {
     self.request_with_params(method, path, &(), bf)
+  }
+
+  pub fn request_paginated<T, F>(
+    &self,
+    method: Method,
+    path: &str,
+    bf: F,
+  ) -> ShopifyResult<Paginated<T>>
+  where
+    T: for<'de> Deserialize<'de>,
+    F: FnOnce(&mut RequestBuilder),
+  {
+    self.request_with_params_paginated(method, path, &(), bf)
   }
 
   pub fn request_raw<F>(&self, method: Method, path: &str, bf: F) -> ShopifyResult<Response>

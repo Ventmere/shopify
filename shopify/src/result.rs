@@ -29,6 +29,12 @@ pub enum ShopifyError {
 
   #[fail(display = "json error: {}", _0)]
   Json(::serde_json::Error),
+
+  #[fail(display = "url parse error: {}", _0)]
+  UrlParse(::url::ParseError),
+
+  #[fail(display = "page_info parameter was not found in the link url")]
+  PageInfoNotPresent,
 }
 
 impl ShopifyError {
