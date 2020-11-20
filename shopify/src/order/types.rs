@@ -54,7 +54,7 @@ pub struct ClientDetails {
   browser_ip: Option<String>,
   accept_language: Option<String>,
   user_agent: Option<String>,
-  session_hash: Value,
+  session_hash: Option<Value>,
   browser_width: Option<i64>,
   browser_height: Option<i64>,
 }
