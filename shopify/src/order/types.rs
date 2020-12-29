@@ -28,6 +28,7 @@ pub enum ShipmentStatus {
   AttemptedDelivery,
   Delivered,
   Failure,
+  LabelPrinted
 }
 
 #[derive(Debug, Serialize, Deserialize)]
