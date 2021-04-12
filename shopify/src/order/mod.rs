@@ -29,6 +29,8 @@ request_query! {
 pub trait OrderApi {
   fn get_list(&self, params: &GetOrderListParams) -> ShopifyResult<Vec<Order>>;
 
+  fn get(&self, id: i64) -> ShopifyResult<Order>;
+
   fn create_fulfillment(
     &self,
     order_id: i64,
@@ -58,6 +60,17 @@ impl OrderApi for Client {
     }
 
     let res: Res = self.request_with_params(Method::Get, "/admin/orders.json", params, |_| {})?;
+    Ok(res.into_inner())
+  }
+
+  fn get(&self, id: i64) -> ShopifyResult<Order> {
+    shopify_wrap! {
+      pub struct Res {
+        order: Order,
+      }
+    }
+
+    let res: Res = self.request(Method::Get, &format!("/admin/orders/{}.json", id), |_| {})?;
     Ok(res.into_inner())
   }
 

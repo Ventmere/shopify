@@ -15,6 +15,12 @@ struct Opts {
 enum SubCommand {
   ProductList,
   VariantList,
+  OrderGet(OrderGet),
+}
+
+#[derive(Clap)]
+struct OrderGet {
+  id: i64,
 }
 
 fn main() {
@@ -31,6 +37,7 @@ fn main() {
   match opts.subcmd {
     SubCommand::ProductList => product_list(&client),
     SubCommand::VariantList => variant_list(&client),
+    SubCommand::OrderGet(OrderGet { id }) => order_get(&client, id),
   }
 }
 
@@ -90,4 +97,11 @@ fn variant_list(client: &Client) {
   }
 
   serde_json::to_writer_pretty(std::io::stdout(), &all).unwrap()
+}
+
+fn order_get(client: &Client, id: i64) {
+  use shopify::order::*;
+
+  let order = client.get(id).unwrap();
+  serde_json::to_writer_pretty(std::io::stdout(), &order).unwrap()
 }
