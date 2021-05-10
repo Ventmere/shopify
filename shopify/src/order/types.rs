@@ -28,7 +28,7 @@ pub enum ShipmentStatus {
   AttemptedDelivery,
   Delivered,
   Failure,
-  LabelPrinted
+  LabelPrinted,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -118,9 +118,9 @@ pub struct LineItems {
   pub quantity: i64,
   pub price: String,
   pub grams: i64,
-  pub sku: String,
+  pub sku: Option<String>,
   pub variant_title: Option<String>,
-  pub vendor: String,
+  pub vendor: Option<String>,
   pub fulfillment_service: String,
   pub product_id: Option<i64>,
   pub requires_shipping: bool,
