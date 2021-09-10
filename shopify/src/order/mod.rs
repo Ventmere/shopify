@@ -182,6 +182,7 @@ mod tests {
     let mut params = GetOrderListParams::default();
     params.limit = Some(250);
     params.status = Some("any".to_owned());
+    params.created_at_min = Some(Utc.ymd(2021, 5, 6).and_hms(18, 11, 0));
     let mut page = 1;
     loop {
       println!("Downloading page {}", page);

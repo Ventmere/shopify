@@ -103,5 +103,6 @@ fn order_get(client: &Client, id: i64) {
   use shopify::order::*;
 
   let order = client.get(id).unwrap();
+
   serde_json::to_writer_pretty(std::io::stdout(), &order).unwrap()
 }

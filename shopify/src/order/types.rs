@@ -247,7 +247,7 @@ pub struct ShippingLines {
   pub title: String,
   pub price: String,
   pub code: String,
-  pub source: String,
+  pub source: Option<String>,
   pub phone: Option<String>,
   pub requested_fulfillment_service_id: Value,
   pub delivery_category: Value,
