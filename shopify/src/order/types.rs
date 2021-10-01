@@ -33,7 +33,7 @@ pub enum ShipmentStatus {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Address {
-  pub first_name: String,
+  pub first_name: Option<String>,
   pub address1: String,
   pub phone: Option<String>,
   pub city: String,
@@ -67,7 +67,7 @@ pub struct Customer {
   pub accepts_marketing: bool,
   pub created_at: String,
   pub updated_at: String,
-  pub first_name: String,
+  pub first_name: Option<String>,
   pub last_name: Option<String>,
   pub orders_count: i64,
   pub state: String,
@@ -87,7 +87,7 @@ pub struct Customer {
 pub struct DefaultAddress {
   pub id: i64,
   pub customer_id: i64,
-  pub first_name: String,
+  pub first_name: Option<String>,
   pub last_name: String,
   pub company: Option<String>,
   pub address1: String,
