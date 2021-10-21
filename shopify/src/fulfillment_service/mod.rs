@@ -1,5 +1,5 @@
-use client::{Client, Method};
-use result::*;
+use crate::client::{Client, Method};
+use crate::result::*;
 
 mod types;
 pub use self::types::*;
@@ -38,10 +38,10 @@ impl FulfillmentServiceApi for Client {
     }
 
     let res: Res = self.request_with_params(
-      Method::Get,
+      Method::GET,
       "/admin/fulfillment_services.json",
       &scope.map(|scope| ("scope", scope)),
-      |_| {},
+      std::convert::identity,
     )?;
     Ok(res.into_inner())
   }
@@ -56,8 +56,8 @@ impl FulfillmentServiceApi for Client {
       }
     }
     let path = "/admin/fulfillment_services.json";
-    let res: Res = self.request(Method::Post, &path, move |b| {
-      b.json(&json!({ "fulfillment_service": fulfillment_service }));
+    let res: Res = self.request(Method::POST, &path, move |b| {
+      b.json(&json!({ "fulfillment_service": fulfillment_service }))
     })?;
     Ok(res.into_inner())
   }
@@ -69,7 +69,7 @@ impl FulfillmentServiceApi for Client {
       }
     }
     let path = format!("/admin/fulfillment_services/{}.json", id);
-    let res: Res = self.request(Method::Get, &path, move |_| {})?;
+    let res: Res = self.request(Method::GET, &path, std::convert::identity)?;
     Ok(res.into_inner())
   }
 
@@ -84,8 +84,8 @@ impl FulfillmentServiceApi for Client {
       }
     }
     let path = format!("/admin/fulfillment_services/{}.json", id);
-    let res: Res = self.request(Method::Put, &path, move |b| {
-      b.json(&json!({ "fulfillment_service": fulfillment_service }));
+    let res: Res = self.request(Method::PUT, &path, move |b| {
+      b.json(&json!({ "fulfillment_service": fulfillment_service }))
     })?;
     Ok(res.into_inner())
   }
@@ -98,7 +98,7 @@ impl FulfillmentServiceApi for Client {
       }
     }
     let path = format!("/admin/fulfillment_services/{}.json", id);
-    self.request::<Value, _>(Method::Delete, &path, |_| {})?;
+    self.request::<Value, _>(Method::DELETE, &path, std::convert::identity)?;
     Ok(())
   }
 }
@@ -110,7 +110,7 @@ mod tests {
   #[test]
   #[ignore]
   fn test_fulfillment_service_get_list() {
-    let client = ::client::get_test_client();
+    let client = crate::client::get_test_client();
     let service = client
       .get_list(Some(FulfillmentServiceScope::CurrentClient))
       .unwrap();
@@ -120,7 +120,7 @@ mod tests {
   #[test]
   #[ignore]
   fn test_fulfillment_service_get_one() {
-    let client = ::client::get_test_client();
+    let client = crate::client::get_test_client();
     let service = client.get(191681).unwrap();
     println!("{:#?}", service);
   }
@@ -128,7 +128,7 @@ mod tests {
   #[test]
   #[ignore]
   fn test_fulfillment_service_create() {
-    let client = ::client::get_test_client();
+    let client = crate::client::get_test_client();
     let service = client
       .create(&NewFulfillmentService {
         name: "S2".to_owned(),
@@ -145,7 +145,7 @@ mod tests {
   #[test]
   #[ignore]
   fn test_fulfillment_service_update() {
-    let client = ::client::get_test_client();
+    let client = crate::client::get_test_client();
     let mut update = UpdateFulfillmentService::default();
     update.name = Some("Ventmere S2".to_owned());
     let service = client.update(13008909, &update).unwrap();
@@ -155,7 +155,7 @@ mod tests {
   #[test]
   #[ignore]
   fn test_fulfillment_service_delete() {
-    let client = ::client::get_test_client();
+    let client = crate::client::get_test_client();
     client.delete(12976141).optional().unwrap();
   }
 }

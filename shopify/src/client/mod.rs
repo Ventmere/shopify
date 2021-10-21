@@ -1,10 +1,10 @@
 use crate::pagination::Paginated;
 pub use reqwest::Method;
-use reqwest::Response;
-use reqwest::{Client as HttpClient, RequestBuilder, StatusCode, Url};
-use result::*;
+use reqwest::blocking::Response;
+use reqwest::{blocking::Client as HttpClient, blocking::RequestBuilder, StatusCode, Url};
+use crate::result::*;
 use serde::Deserialize;
-use types::{DateTime, Utc};
+use crate::types::{DateTime, Utc};
 
 mod types;
 pub use self::types::*;
@@ -17,7 +17,7 @@ macro_rules! shopify_wrap {
       $key:ident: $inner_t:ty$(,)*
     }
   ) => {
-    use client::ShopifyWarpper;
+    use crate::client::ShopifyWarpper;
 
     #[derive(Debug, Deserialize)]
     pub struct $t {
@@ -84,7 +84,7 @@ macro_rules! request_query {
       $(,)*
     }
   ) => (
-    use client::{ShopifyRequestQuery, AsQueryValue};
+    use crate::client::{ShopifyRequestQuery, AsQueryValue};
 
     #[derive(Debug, Default)]
     pub struct $t {
@@ -156,26 +156,26 @@ impl Client {
   where
     P: ShopifyRequestQuery,
     T: for<'de> Deserialize<'de>,
-    F: FnOnce(&mut RequestBuilder),
+    F: FnOnce(RequestBuilder) -> RequestBuilder,
   {
     let mut url = self.base_url.join(path)?;
     url.query_pairs_mut().extend_pairs(params.as_query_pairs());
     let mut b = self.client.request(method, url);
-    b.basic_auth(self.api_key.clone(), Some(self.password.clone()));
+    b = b.basic_auth(self.api_key.clone(), Some(self.password.clone()));
 
-    bf(&mut b);
+    b = bf(b);
 
-    let mut res = b.send()?;
-
-    if !res.status().is_success() {
-      if res.status() == StatusCode::NotFound {
+    let res = b.send()?;
+    let status = res.status();
+    if !status.is_success() {
+      if status == StatusCode::NOT_FOUND {
         return Err(ShopifyError::NotFound);
       }
 
       let body = res.text()?;
       return Err(ShopifyError::Request {
         path: path.to_owned(),
-        status: res.status(),
+        status,
         body,
       });
     }
@@ -193,37 +193,38 @@ impl Client {
   where
     P: ShopifyRequestQuery,
     T: for<'de> Deserialize<'de>,
-    F: FnOnce(&mut RequestBuilder),
+    F: FnOnce(RequestBuilder) -> RequestBuilder,
   {
     let mut url = self.base_url.join(path)?;
     url.query_pairs_mut().extend_pairs(params.as_query_pairs());
     let mut b = self.client.request(method, url);
-    b.basic_auth(self.api_key.clone(), Some(self.password.clone()));
+    b = b.basic_auth(self.api_key.clone(), Some(self.password.clone()));
 
-    bf(&mut b);
+    b = bf(b);
 
-    let mut res = b.send()?;
+    let res = b.send()?;
+    let status = res.status();
 
-    if !res.status().is_success() {
-      if res.status() == StatusCode::NotFound {
+    if !status.is_success() {
+      if status == StatusCode::NOT_FOUND {
         return Err(ShopifyError::NotFound);
       }
 
       let body = res.text()?;
       return Err(ShopifyError::Request {
         path: path.to_owned(),
-        status: res.status(),
+        status,
         body,
       });
     }
 
-    Ok(Paginated::from_res(&mut res)?)
+    Ok(Paginated::from_res(res)?)
   }
 
   pub fn request<T, F>(&self, method: Method, path: &str, bf: F) -> ShopifyResult<T>
   where
     T: for<'de> Deserialize<'de>,
-    F: FnOnce(&mut RequestBuilder),
+    F: FnOnce(RequestBuilder) -> RequestBuilder,
   {
     self.request_with_params(method, path, &(), bf)
   }
@@ -236,20 +237,20 @@ impl Client {
   ) -> ShopifyResult<Paginated<T>>
   where
     T: for<'de> Deserialize<'de>,
-    F: FnOnce(&mut RequestBuilder),
+    F: FnOnce(RequestBuilder) -> RequestBuilder,
   {
     self.request_with_params_paginated(method, path, &(), bf)
   }
 
   pub fn request_raw<F>(&self, method: Method, path: &str, bf: F) -> ShopifyResult<Response>
   where
-    F: FnOnce(&mut RequestBuilder),
+    F: FnOnce(RequestBuilder) -> RequestBuilder,
   {
     let url = self.base_url.join(path)?;
     let mut b = self.client.request(method, url);
-    b.basic_auth(self.api_key.clone(), Some(self.password.clone()));
+    b = b.basic_auth(self.api_key.clone(), Some(self.password.clone()));
 
-    bf(&mut b);
+    b = bf(b);
 
     b.send().map_err(Into::into)
   }

@@ -1,7 +1,6 @@
 use crate::client::ShopifyRequestQuery;
 use crate::result::{ShopifyError, ShopifyResult};
-use reqwest::header::Link;
-use reqwest::Response;
+use reqwest::blocking::Response;
 use serde::Deserialize;
 use url::Url;
 
@@ -44,20 +43,23 @@ pub struct Paginated<T> {
 }
 
 impl<T> Paginated<T> {
-  pub fn from_res(res: &mut Response) -> ShopifyResult<Paginated<T>>
+  pub fn from_res(res: Response) -> ShopifyResult<Paginated<T>>
   where
     T: for<'de> Deserialize<'de>,
   {
     let mut previous_url = None;
     let mut next_url = None;
-    if let Some(link) = res.headers().get::<Link>() {
-      use reqwest::header::RelationType;
-      for value in link.values() {
-        if let Some(rels) = value.rel() {
-          if rels.len() == 1 && rels.get(0) == Some(&RelationType::Prev) {
-            previous_url = value.link().to_string().into();
-          } else if rels.len() == 1 && rels.get(0) == Some(&RelationType::Next) {
-            next_url = value.link().to_string().into();
+    if let Some(link) = res.headers().get("link")
+      .and_then(|v| v.to_str().ok().and_then(|v| {
+        parse_link_header::parse(v).ok()
+      }))
+    {
+      for (k, v) in link {
+        if let Some(rel) = k {
+          if rel == "prev" {
+            previous_url = v.raw_uri.into();
+          } else if rel == "next" {
+            next_url = v.raw_uri.into();
           }
         }
       }

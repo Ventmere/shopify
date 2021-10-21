@@ -1,4 +1,4 @@
-use types::{DateTime, Utc, Value};
+use crate::types::{DateTime, Utc, Value};
 
 /// The Shopify API's shop object is a collection of the general settings and information about the shop.
 #[derive(Debug, Deserialize)]

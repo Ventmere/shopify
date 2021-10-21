@@ -1,5 +1,5 @@
-use client::{Client, Method};
-use result::*;
+use crate::client::{Client, Method};
+use crate::result::*;
 
 mod types;
 pub use self::types::*;
@@ -17,7 +17,7 @@ impl LocationApi for Client {
       }
     }
 
-    let res: Res = self.request(Method::Get, "/admin/locations.json", |_| {})?;
+    let res: Res = self.request(Method::GET, "/admin/locations.json", std::convert::identity)?;
     Ok(res.into_inner())
   }
 
@@ -28,7 +28,7 @@ impl LocationApi for Client {
       }
     }
     let path = format!("/admin/locations/{}.json", id);
-    let res: Res = self.request(Method::Get, &path, move |_| {})?;
+    let res: Res = self.request(Method::GET, &path, std::convert::identity)?;
     Ok(res.into_inner())
   }
 }
@@ -55,7 +55,7 @@ impl InventoryLevelApi for Client {
     }
 
     let res: Res =
-      self.request_with_params(Method::Get, "/admin/inventory_levels.json", params, |_| {})?;
+      self.request_with_params(Method::GET, "/admin/inventory_levels.json", params, std::convert::identity)?;
     Ok(res.into_inner())
   }
 }

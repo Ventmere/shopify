@@ -1,13 +1,13 @@
 use reqwest::StatusCode;
+use thiserror::Error;
 
-#[derive(Fail, Debug)]
+#[derive(Error, Debug)]
 pub enum ShopifyError {
-  #[fail(display = "not found")]
+  #[error("not found")]
   NotFound,
 
-  #[fail(
-    display = "request error: path = '{}', status = '{}', body = '{}'",
-    path, status, body
+  #[error(
+    "request error: path = '{path}', status = '{status}', body = '{body}'"
   )]
   Request {
     path: String,
@@ -15,25 +15,22 @@ pub enum ShopifyError {
     body: String,
   },
 
-  #[fail(display = "invalid response")]
+  #[error("invalid response")]
   InvalidResponse,
 
-  #[fail(display = "http error: {}", _0)]
-  Http(::reqwest::Error),
+  #[error("http error: {0}")]
+  Http(#[from] reqwest::Error),
 
-  #[fail(display = "url error: {}", _0)]
-  Url(::reqwest::UrlError),
+  #[error("io error: {0}")]
+  Io(#[from] std::io::Error),
 
-  #[fail(display = "io error: {}", _0)]
-  Io(::std::io::Error),
+  #[error("json error: {0}")]
+  Json(#[from] serde_json::Error),
 
-  #[fail(display = "json error: {}", _0)]
-  Json(::serde_json::Error),
+  #[error("url parse error: {0}")]
+  UrlParse(#[from] url::ParseError),
 
-  #[fail(display = "url parse error: {}", _0)]
-  UrlParse(::url::ParseError),
-
-  #[fail(display = "page_info parameter was not found in the link url")]
+  #[error("page_info parameter was not found in the link url")]
   PageInfoNotPresent,
 }
 
@@ -66,18 +63,3 @@ impl<T> OptionalShopifyResult<T> for ShopifyResult<T> {
     }
   }
 }
-
-macro_rules! impl_from {
-  ($v:ident($t:ty)) => {
-    impl From<$t> for ShopifyError {
-      fn from(e: $t) -> Self {
-        ShopifyError::$v(e)
-      }
-    }
-  };
-}
-
-impl_from!(Http(::reqwest::Error));
-impl_from!(Url(::reqwest::UrlError));
-impl_from!(Io(::std::io::Error));
-impl_from!(Json(::serde_json::Error));

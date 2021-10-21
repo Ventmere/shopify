@@ -1,6 +1,6 @@
-use client::{Client, Method};
-use result::*;
-use types::{DateTime, Utc};
+use crate::client::{Client, Method};
+use crate::result::*;
+use crate::types::{DateTime, Utc};
 
 mod types;
 pub use self::types::*;
@@ -59,7 +59,7 @@ impl OrderApi for Client {
       }
     }
 
-    let res: Res = self.request_with_params(Method::Get, "/admin/orders.json", params, |_| {})?;
+    let res: Res = self.request_with_params(Method::GET, "/admin/orders.json", params, std::convert::identity)?;
     Ok(res.into_inner())
   }
 
@@ -70,7 +70,7 @@ impl OrderApi for Client {
       }
     }
 
-    let res: Res = self.request(Method::Get, &format!("/admin/orders/{}.json", id), |_| {})?;
+    let res: Res = self.request(Method::GET, &format!("/admin/orders/{}.json", id), std::convert::identity)?;
     Ok(res.into_inner())
   }
 
@@ -85,8 +85,8 @@ impl OrderApi for Client {
       }
     }
     let path = format!("/admin/orders/{}/fulfillments.json", order_id);
-    let res: Res = self.request(Method::Post, &path, move |b| {
-      b.json(&json!({ "fulfillment": fulfillment }));
+    let res: Res = self.request(Method::POST, &path, move |b| {
+      b.json(&json!({ "fulfillment": fulfillment }))
     })?;
     Ok(res.into_inner())
   }
@@ -107,8 +107,8 @@ impl OrderApi for Client {
       order_id = order_id,
       fulfillment_id = fulfillment_id
     );
-    let res: Res = self.request(Method::Put, &path, move |b| {
-      b.json(&json!({ "fulfillment": fulfillment }));
+    let res: Res = self.request(Method::PUT, &path, move |b| {
+      b.json(&json!({ "fulfillment": fulfillment }))
     })?;
     Ok(res.into_inner())
   }
@@ -124,7 +124,7 @@ impl OrderApi for Client {
       order_id = order_id,
       fulfillment_id = fulfillment_id
     );
-    let res: Res = self.request(Method::Post, &path, |_| {})?;
+    let res: Res = self.request(Method::POST, &path, std::convert::identity)?;
     Ok(res.into_inner())
   }
 
@@ -139,7 +139,7 @@ impl OrderApi for Client {
       order_id = order_id,
       fulfillment_id = fulfillment_id
     );
-    let res: Res = self.request(Method::Post, &path, |_| {})?;
+    let res: Res = self.request(Method::POST, &path, std::convert::identity)?;
     Ok(res.into_inner())
   }
 
@@ -154,7 +154,7 @@ impl OrderApi for Client {
       order_id = order_id,
       fulfillment_id = fulfillment_id
     );
-    let res: Res = self.request(Method::Post, &path, |_| {})?;
+    let res: Res = self.request(Method::POST, &path, std::convert::identity)?;
     Ok(res.into_inner())
   }
 }
@@ -170,7 +170,6 @@ mod tests {
     use chrono::TimeZone;
     use serde_json::{self, Value};
     use std::fs::File;
-    use std::io::Write;
 
     shopify_wrap! {
       pub struct RawOrders {
@@ -178,7 +177,7 @@ mod tests {
       }
     }
 
-    let client = ::client::get_test_client();
+    let client = crate::client::get_test_client();
     let mut params = GetOrderListParams::default();
     params.limit = Some(250);
     params.status = Some("any".to_owned());
@@ -188,7 +187,7 @@ mod tests {
       println!("Downloading page {}", page);
 
       let orders = client
-        .request_with_params::<_, RawOrders, _>(Method::Get, "/admin/orders.json", &params, |_| {})
+        .request_with_params::<_, RawOrders, _>(Method::GET, "/admin/orders.json", &params, std::convert::identity)
         .unwrap()
         .into_inner();
 
@@ -248,7 +247,7 @@ mod tests {
   #[test]
   #[ignore]
   fn test_create_fulfillment() {
-    let client = ::client::get_test_client();
+    let client =crate::client::get_test_client();
     let mut f = NewFulfillment::new();
     f.add_item(59878440973, Some(1)).tracking_number("7777");
     client.create_fulfillment(33673216013, &f).unwrap();
@@ -256,7 +255,7 @@ mod tests {
 
   #[test]
   fn test_update_fulfillment() {
-    let client = ::client::get_test_client();
+    let client =crate::client::get_test_client();
     let mut f = NewFulfillment::new();
     f.add_item(59878440973, Some(1))
       .tracking_number("1Z30434EDG37750543");

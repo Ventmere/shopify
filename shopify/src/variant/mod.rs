@@ -1,6 +1,6 @@
 use crate::pagination::{GetPage, Paginated};
-use client::{Client, Method};
-use result::*;
+use crate::client::{Client, Method};
+use crate::result::*;
 use serde::Serialize;
 
 mod types;
@@ -30,10 +30,10 @@ impl ProductVariantApi for Client {
     }
 
     let res: Paginated<Res> = self.request_with_params_paginated(
-      Method::Get,
+      Method::GET,
       "/admin/api/2020-07/variants.json",
       params,
-      |_| {},
+      std::convert::identity,
     )?;
     Ok(res.map(|p| p.into_inner()))
   }
@@ -45,10 +45,10 @@ impl ProductVariantApi for Client {
       }
     }
     let res: Paginated<Res> = self.request_with_params_paginated(
-      Method::Get,
+      Method::GET,
       "/admin/api/2020-07/variants.json",
       params,
-      |_| {},
+      std::convert::identity,
     )?;
     Ok(res.map(|p| p.into_inner()))
   }
@@ -61,11 +61,10 @@ impl ProductVariantApi for Client {
     }
 
     let path = format!("/admin/variants/{}.json", id);
-    let res: Res = self.request(Method::Put, &path, move |b| {
+    let res: Res = self.request(Method::PUT, &path, move |b| {
       b.json(&json!({
         "variant": value,
-      }));
-      ()
+      }))
     })?;
     Ok(res.into_inner())
   }
@@ -105,10 +104,10 @@ impl ProductVariantApi for Client {
 
 //       let variants = client
 //         .request_with_params::<_, RawVariants, _>(
-//           Method::Get,
+//           Method::GET,
 //           "/admin/variants.json",
 //           &params,
-//           |_| {},
+//           std::convert::identity,
 //         )
 //         .unwrap()
 //         .into_inner();

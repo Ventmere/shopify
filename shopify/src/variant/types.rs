@@ -1,4 +1,4 @@
-use types::{DateTime, Utc};
+use crate::types::{DateTime, Utc};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Variant {

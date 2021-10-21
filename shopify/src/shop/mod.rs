@@ -1,5 +1,5 @@
-use client::{Client, Method};
-use result::*;
+use crate::client::{Client, Method};
+use crate::result::*;
 
 mod types;
 pub use self::types::*;
@@ -16,7 +16,7 @@ pub trait ShopApi {
 
 impl ShopApi for Client {
   fn get(&self) -> ShopifyResult<Shop> {
-    let res: GetShop = self.request(Method::Get, "/admin/shop.json", |_| {})?;
+    let res: GetShop = self.request(Method::GET, "/admin/shop.json", std::convert::identity)?;
     Ok(res.into_inner())
   }
 }
@@ -90,7 +90,7 @@ mod tests {
   #[test]
   #[ignore]
   fn test_get_shop() {
-    let client = ::client::get_test_client();
+    let client = crate::client::get_test_client();
     let shop = client.get().unwrap();
     println!("{:#?}", shop);
   }
