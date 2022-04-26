@@ -1,9 +1,9 @@
-use clap::Clap;
+use clap::Parser;
 use serde_json;
 use shopify::client::Client;
 use std::env::var;
 
-#[derive(Clap)]
+#[derive(Parser)]
 struct Opts {
   #[clap(short, long, default_value = ".env")]
   config: String,
@@ -11,14 +11,14 @@ struct Opts {
   subcmd: SubCommand,
 }
 
-#[derive(Clap)]
+#[derive(Parser)]
 enum SubCommand {
   ProductList,
   VariantList,
   OrderGet(OrderGet),
 }
 
-#[derive(Clap)]
+#[derive(Parser)]
 struct OrderGet {
   id: i64,
 }
