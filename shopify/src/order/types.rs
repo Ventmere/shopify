@@ -107,7 +107,7 @@ pub struct DefaultAddress {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Property {
   pub name: String,
-  pub value: Option<String>,
+  pub value: Option<Value>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

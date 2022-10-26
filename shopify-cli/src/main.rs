@@ -1,7 +1,7 @@
 use clap::Parser;
 use serde_json;
 use shopify::client::Client;
-use std::env::var;
+use std::{env::var};
 
 #[derive(Parser)]
 struct Opts {
@@ -15,6 +15,7 @@ struct Opts {
 enum SubCommand {
   ProductList,
   VariantList,
+  OrderList,
   OrderGet(OrderGet),
 }
 
@@ -38,6 +39,7 @@ fn main() {
     SubCommand::ProductList => product_list(&client),
     SubCommand::VariantList => variant_list(&client),
     SubCommand::OrderGet(OrderGet { id }) => order_get(&client, id),
+    SubCommand::OrderList => order_list(&client),
   }
 }
 
@@ -105,4 +107,12 @@ fn order_get(client: &Client, id: i64) {
   let order = client.get(id).unwrap();
 
   serde_json::to_writer_pretty(std::io::stdout(), &order).unwrap()
+}
+
+fn order_list(client: &Client) {
+  use shopify::order::*;
+
+  let orders = client.get_list(&Default::default()).unwrap();
+
+  serde_json::to_writer_pretty(std::io::stdout(), &orders).unwrap()
 }
