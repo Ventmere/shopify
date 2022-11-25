@@ -31,6 +31,8 @@ pub trait OrderApi {
 
   fn get(&self, id: i64) -> ShopifyResult<Order>;
 
+  fn get_risks(&self, order_id: i64) -> ShopifyResult<Vec<OrderRisk>>;
+
   fn create_fulfillment(
     &self,
     order_id: i64,
@@ -71,6 +73,20 @@ impl OrderApi for Client {
     }
 
     let res: Res = self.request(Method::GET, &format!("/admin/orders/{}.json", id), std::convert::identity)?;
+    Ok(res.into_inner())
+  }
+
+  fn get_risks(&self, order_id: i64) -> ShopifyResult<Vec<OrderRisk>> {
+    shopify_wrap! {
+      pub struct Res {
+        risks: Vec<OrderRisk>,
+      }
+    }
+    let path = format!(
+      "/admin/orders/{order_id}/risks.json",
+      order_id = order_id
+    );
+    let res: Res = self.request(Method::GET, &path, std::convert::identity)?;
     Ok(res.into_inner())
   }
 
@@ -209,7 +225,7 @@ mod tests {
   }
 
   #[test]
-  // #[ignore]
+  #[ignore]
   fn test_deserialize_all() {
     use serde_json::{self, Value};
     use std::fs;

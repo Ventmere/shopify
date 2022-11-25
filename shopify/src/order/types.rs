@@ -262,3 +262,16 @@ pub struct TaxLines {
   pub price: String,
   pub rate: f64,
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct OrderRisk {
+  pub cause_cancel: Option<bool>,
+  pub checkout_id: Option<i64>,
+  pub display: Option<bool>,
+  pub id: Option<i64>,
+  pub message: String,
+  pub order_id: Option<i64>,
+  pub recommendation: String,
+  pub score: Option<String>,
+  pub source: String,
+}

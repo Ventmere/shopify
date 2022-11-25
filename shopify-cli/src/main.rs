@@ -17,6 +17,7 @@ enum SubCommand {
   VariantList,
   OrderList,
   OrderGet(OrderGet),
+  OrderGetRisks(OrderGet)
 }
 
 #[derive(Parser)]
@@ -39,6 +40,7 @@ fn main() {
     SubCommand::ProductList => product_list(&client),
     SubCommand::VariantList => variant_list(&client),
     SubCommand::OrderGet(OrderGet { id }) => order_get(&client, id),
+    SubCommand::OrderGetRisks(OrderGet { id }) => order_get_risks(&client, id),
     SubCommand::OrderList => order_list(&client),
   }
 }
@@ -107,6 +109,14 @@ fn order_get(client: &Client, id: i64) {
   let order = client.get(id).unwrap();
 
   serde_json::to_writer_pretty(std::io::stdout(), &order).unwrap()
+}
+
+fn order_get_risks(client: &Client, id: i64) {
+  use shopify::order::*;
+
+  let risks = client.get_risks(id).unwrap();
+
+  serde_json::to_writer_pretty(std::io::stdout(), &risks).unwrap()
 }
 
 fn order_list(client: &Client) {
