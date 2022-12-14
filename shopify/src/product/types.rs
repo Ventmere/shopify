@@ -6,7 +6,7 @@ pub use crate::variant::Variant;
 pub struct Product {
   pub id: i64,
   pub title: String,
-  pub body_html: String,
+  pub body_html: Option<String>,
   pub vendor: String,
   pub product_type: String,
   pub created_at: DateTime<Utc>,
