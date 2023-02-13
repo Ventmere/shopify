@@ -5,6 +5,7 @@ use crate::types::{DateTime, Utc, Value};
 pub enum FulfillmentStatus {
   Fulfilled,
   Partial,
+  Restocked
 }
 
 #[derive(Debug, Serialize, Deserialize, Copy, Clone, PartialEq)]
@@ -34,9 +35,9 @@ pub enum ShipmentStatus {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Address {
   pub first_name: Option<String>,
-  pub address1: String,
+  pub address1: Option<String>,
   pub phone: Option<String>,
-  pub city: String,
+  pub city: Option<String>,
   pub zip: Option<String>,
   pub province: Option<String>,
   pub country: String,
@@ -45,7 +46,7 @@ pub struct Address {
   pub company: Option<String>,
   pub latitude: Option<f64>,
   pub longitude: Option<f64>,
-  pub name: String,
+  pub name: Option<String>,
   pub country_code: Option<String>,
   pub province_code: Option<String>,
 }
@@ -88,16 +89,16 @@ pub struct DefaultAddress {
   pub id: i64,
   pub customer_id: i64,
   pub first_name: Option<String>,
-  pub last_name: String,
+  pub last_name: Option<String>,
   pub company: Option<String>,
-  pub address1: String,
+  pub address1: Option<String>,
   pub address2: Option<String>,
-  pub city: String,
+  pub city: Option<String>,
   pub province: Option<String>,
   pub country: String,
   pub zip: Option<String>,
   pub phone: Option<String>,
-  pub name: String,
+  pub name: Option<String>,
   pub province_code: Option<String>,
   pub country_code: String,
   pub country_name: String,
