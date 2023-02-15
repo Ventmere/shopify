@@ -100,8 +100,8 @@ pub struct DefaultAddress {
   pub phone: Option<String>,
   pub name: Option<String>,
   pub province_code: Option<String>,
-  pub country_code: String,
-  pub country_name: String,
+  pub country_code: Option<String>,
+  pub country_name: Option<String>,
   pub default: bool,
 }
 
