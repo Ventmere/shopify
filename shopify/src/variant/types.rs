@@ -6,7 +6,7 @@ pub struct Variant {
   pub product_id: i64,
   pub title: String,
   pub price: String,
-  pub sku: String,
+  pub sku: Option<String>,
   pub position: i64,
   pub inventory_policy: String,
   pub compare_at_price: Option<String>,
