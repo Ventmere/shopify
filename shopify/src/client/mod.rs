@@ -173,6 +173,7 @@ impl Client {
       }
 
       let body = res.text()?;
+
       return Err(ShopifyError::Request {
         path: path.to_owned(),
         status,

@@ -4,8 +4,10 @@ use crate::types::{DateTime, Utc};
 
 mod types;
 pub use self::types::*;
+mod fulfillment_order;
+pub use self::fulfillment_order::*;
 mod fulfillment;
-pub use self::fulfillment::NewFulfillment;
+pub use self::fulfillment::*;
 
 request_query! {
   pub struct GetOrderListParams {
@@ -33,24 +35,11 @@ pub trait OrderApi {
 
   fn get_risks(&self, order_id: i64) -> ShopifyResult<Vec<OrderRisk>>;
 
-  fn create_fulfillment(
-    &self,
-    order_id: i64,
-    fulfillment: &NewFulfillment,
-  ) -> ShopifyResult<Fulfillment>;
+  fn get_fulfillment_orders(&self, order_id: i64) -> ShopifyResult<Vec<FulfillmentOrder>>;
 
-  fn update_fulfillment(
-    &self,
-    order_id: i64,
-    fulfillment_id: i64,
-    fulfillment: &NewFulfillment,
-  ) -> ShopifyResult<Fulfillment>;
+  fn move_fulfillment_order(&self, fulfillment_order_id: i64, move_fulfillment_order: &MoveFulfillmentOrderRequest) -> ShopifyResult<MoveFulfillmentOrderResponse>;
 
-  fn complete_fulfillment(&self, order_id: i64, fulfillment_id: i64) -> ShopifyResult<Fulfillment>;
-
-  fn open_fulfillment(&self, order_id: i64, fulfillment_id: i64) -> ShopifyResult<Fulfillment>;
-
-  fn cancel_fulfillment(&self, order_id: i64, fulfillment_id: i64) -> ShopifyResult<Fulfillment>;
+  fn create_fulfillment(&self, fulfillment: &CreateFulfillmentRequest) -> ShopifyResult<Fulfillment>;
 }
 
 impl OrderApi for Client {
@@ -90,87 +79,44 @@ impl OrderApi for Client {
     Ok(res.into_inner())
   }
 
-  fn create_fulfillment(
-    &self,
-    order_id: i64,
-    fulfillment: &NewFulfillment,
-  ) -> ShopifyResult<Fulfillment> {
+  fn get_fulfillment_orders(&self, order_id: i64) -> ShopifyResult<Vec<FulfillmentOrder>> {
     shopify_wrap! {
       pub struct Res {
-        fulfillment: Fulfillment,
+        fulfillment_orders: Vec<FulfillmentOrder>,
       }
     }
-    let path = format!("/admin/orders/{}/fulfillments.json", order_id);
-    let res: Res = self.request(Method::POST, &path, move |b| {
-      b.json(&json!({ "fulfillment": fulfillment }))
+    let path = format!(
+      "/admin/api/2023-07/orders/{order_id}/fulfillment_orders.json",
+      order_id = order_id,
+    );
+    let res: Res = self.request(Method::GET, &path, std::convert::identity)?;
+    Ok(res.into_inner())
+  }
+
+  fn move_fulfillment_order(&self, fulfillment_order_id: i64, move_fulfillment_order: &MoveFulfillmentOrderRequest) -> ShopifyResult<MoveFulfillmentOrderResponse> {
+    let path = format!(
+      "/admin/api/2023-04/fulfillment_orders/{id}/move.json",
+      id = fulfillment_order_id,
+    );
+    let res: MoveFulfillmentOrderResponse = self.request(Method::POST, &path, move |b| {
+      b.json(&serde_json::json!({
+        "fulfillment_order": move_fulfillment_order,
+      }))
     })?;
-    Ok(res.into_inner())
+    Ok(res)
   }
 
-  fn update_fulfillment(
-    &self,
-    order_id: i64,
-    fulfillment_id: i64,
-    fulfillment: &NewFulfillment,
-  ) -> ShopifyResult<Fulfillment> {
+  fn create_fulfillment(&self, fulfillment: &CreateFulfillmentRequest) -> ShopifyResult<Fulfillment> {
     shopify_wrap! {
       pub struct Res {
         fulfillment: Fulfillment,
       }
     }
-    let path = format!(
-      "/admin/orders/{order_id}/fulfillments/{fulfillment_id}.json",
-      order_id = order_id,
-      fulfillment_id = fulfillment_id
-    );
-    let res: Res = self.request(Method::PUT, &path, move |b| {
-      b.json(&json!({ "fulfillment": fulfillment }))
+    let res: Res = self.request(Method::POST, "/admin/api/2023-04/fulfillments.json", move |b| {
+      b.json(&serde_json::json!({
+        "fulfillment": fulfillment,
+      }))
     })?;
-    Ok(res.into_inner())
-  }
-
-  fn complete_fulfillment(&self, order_id: i64, fulfillment_id: i64) -> ShopifyResult<Fulfillment> {
-    shopify_wrap! {
-      pub struct Res {
-        fulfillment: Fulfillment,
-      }
-    }
-    let path = format!(
-      "/admin/orders/{order_id}/fulfillments/{fulfillment_id}/complete.json",
-      order_id = order_id,
-      fulfillment_id = fulfillment_id
-    );
-    let res: Res = self.request(Method::POST, &path, std::convert::identity)?;
-    Ok(res.into_inner())
-  }
-
-  fn open_fulfillment(&self, order_id: i64, fulfillment_id: i64) -> ShopifyResult<Fulfillment> {
-    shopify_wrap! {
-      pub struct Res {
-        fulfillment: Fulfillment,
-      }
-    }
-    let path = format!(
-      "/admin/orders/{order_id}/fulfillments/{fulfillment_id}/open.json",
-      order_id = order_id,
-      fulfillment_id = fulfillment_id
-    );
-    let res: Res = self.request(Method::POST, &path, std::convert::identity)?;
-    Ok(res.into_inner())
-  }
-
-  fn cancel_fulfillment(&self, order_id: i64, fulfillment_id: i64) -> ShopifyResult<Fulfillment> {
-    shopify_wrap! {
-      pub struct Res {
-        fulfillment: Fulfillment,
-      }
-    }
-    let path = format!(
-      "/admin/orders/{order_id}/fulfillments/{fulfillment_id}/cancel.json",
-      order_id = order_id,
-      fulfillment_id = fulfillment_id
-    );
-    let res: Res = self.request(Method::POST, &path, std::convert::identity)?;
     Ok(res.into_inner())
   }
 }
@@ -258,25 +204,5 @@ mod tests {
 
       chunk = chunk + 1;
     }
-  }
-
-  #[test]
-  #[ignore]
-  fn test_create_fulfillment() {
-    let client =crate::client::get_test_client();
-    let mut f = NewFulfillment::new();
-    f.add_item(59878440973, Some(1)).tracking_number("7777");
-    client.create_fulfillment(33673216013, &f).unwrap();
-  }
-
-  #[test]
-  fn test_update_fulfillment() {
-    let client =crate::client::get_test_client();
-    let mut f = NewFulfillment::new();
-    f.add_item(59878440973, Some(1))
-      .tracking_number("1Z30434EDG37750543");
-    client
-      .update_fulfillment(33673216013, 34429861901, &f)
-      .unwrap();
   }
 }

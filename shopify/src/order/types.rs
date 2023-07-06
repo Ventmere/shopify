@@ -70,9 +70,9 @@ pub struct Customer {
   pub updated_at: String,
   pub first_name: Option<String>,
   pub last_name: Option<String>,
-  pub orders_count: i64,
+  pub orders_count: Option<i64>,
   pub state: String,
-  pub total_spent: String,
+  pub total_spent: Option<String>,
   pub last_order_id: Option<i64>,
   pub note: Value,
   pub verified_email: bool,
@@ -188,7 +188,7 @@ pub struct Order {
   pub landing_site: Value,
   pub cancelled_at: Option<DateTime<Utc>>,
   pub cancel_reason: Option<String>,
-  pub total_price_usd: String,
+  pub total_price_usd: Option<String>,
   pub checkout_token: Value,
   pub reference: Value,
   pub user_id: Option<i64>,
@@ -218,14 +218,14 @@ pub struct Order {
   pub shipping_lines: Vec<ShippingLines>,
   pub billing_address: Option<Address>,
   pub shipping_address: Option<Address>,
-  pub fulfillments: Vec<Fulfillment>,
+  pub fulfillments: Vec<OrderFulfillment>,
   pub client_details: Option<ClientDetails>,
   pub refunds: Vec<Value>,
   pub customer: Option<Customer>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Fulfillment {
+pub struct OrderFulfillment {
   pub id: i64,
   pub order_id: i64,
   pub status: String,
