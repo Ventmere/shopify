@@ -36,6 +36,8 @@ pub struct NewFulfillmentService {
   pub tracking_support: bool,
   pub requires_shipping_method: bool,
   pub format: String,
+  pub permits_sku_sharing: bool,
+  pub fulfillment_orders_opt_in: bool,
 }
 
 #[derive(Debug, Serialize, Default)]
@@ -50,4 +52,8 @@ pub struct UpdateFulfillmentService {
   pub tracking_support: Option<bool>,
   #[serde(skip_serializing_if = "Option::is_none")]
   pub requires_shipping_method: Option<bool>,
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub permits_sku_sharing: Option<bool>,
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub fulfillment_orders_opt_in: Option<bool>,
 }
