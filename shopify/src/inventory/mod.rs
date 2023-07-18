@@ -62,12 +62,25 @@ impl InventoryLevelApi for Client {
 
 #[cfg(test)]
 mod tests {
+  use super::*;
+  use std::env::var;
+  use crate::inventory;
+
+  fn create_test_client() -> Client {
+    dotenv::dotenv().ok();
+    Client::new(
+      &var("SHOPIFY_BASE_URL").unwrap(),
+      &var("SHOPIFY_API_KEY").unwrap(),
+      &var("SHOPIFY_PASSWORD").unwrap(),
+    )
+        .unwrap()
+  }
   #[test]
   #[ignore]
   fn test_location_get_list() {
     use super::LocationApi;
-    let client = ::client::get_test_client();
-    let list = client.get_list().unwrap();
+    let client = create_test_client();
+    let list = inventory::LocationApi::get_list(&client).unwrap();
     println!("{:#?}", list);
   }
 
@@ -75,13 +88,13 @@ mod tests {
   #[ignore]
   fn test_inventory_level_get_list() {
     use super::{GetInventoryLevelsParams, InventoryLevelApi};
-    let client = ::client::get_test_client();
-    let list = client
-      .get_list(&GetInventoryLevelsParams {
+    let client = create_test_client();
+    let list = inventory::InventoryLevelApi::get_list(
+      &client,
+       &GetInventoryLevelsParams {
         inventory_item_ids: Some(vec![2819391175, 5746930631]),
         ..Default::default()
-      })
-      .unwrap();
+      }).unwrap();
     println!("{:#?}", list);
   }
 }
