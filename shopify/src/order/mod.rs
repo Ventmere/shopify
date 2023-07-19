@@ -160,7 +160,6 @@ mod tests {
       let id = orders.last().unwrap().get("id").unwrap().as_i64().unwrap();
       println!("count = {}, last_id = {}", orders.len(), id);
 
-      params.page = Some(page + 1);
 
       let f = File::create(format!("{}/order_{}.json", TMP_DIR, page)).unwrap();
       serde_json::to_writer_pretty(f, &orders).unwrap();
