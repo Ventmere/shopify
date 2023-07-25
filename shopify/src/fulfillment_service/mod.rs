@@ -137,6 +137,8 @@ mod tests {
         tracking_support: true,
         requires_shipping_method: true,
         format: "json".to_owned(),
+        permits_sku_sharing: false,
+        fulfillment_orders_opt_in: false,
       })
       .unwrap();
     println!("{:#?}", service);
