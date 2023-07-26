@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        version: [stable, nightly, beta]
+        toolchain: [stable, nightly, beta]
         
     steps:
     
