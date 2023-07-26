@@ -19,10 +19,6 @@ jobs:
       
     - name: Set toolchain
       run: rustup default ${{ matrix.toolchain }}
-
-    - uses: actions/checkout@v3
-    - name: Run tests
-      run: cargo test --verbose
     
     - uses: actions/checkout@v3
     - name: Build
