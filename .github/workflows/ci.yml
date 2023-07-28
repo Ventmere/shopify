@@ -35,6 +35,7 @@ jobs:
 #       run: cargo fmt --check
       
   release-please:
+    needs: build_and_test
     runs-on: ubuntu-latest
     steps:
       - uses: google-github-actions/release-please-action@v3
