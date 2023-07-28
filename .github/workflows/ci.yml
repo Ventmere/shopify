@@ -45,7 +45,7 @@ jobs:
 #       - uses: stefanzweifel/git-auto-commit-action@v4
       
 # Maintains CHANGELOG.md, bumps version in cargo.toml and creates PR against current branch
-  semver-release-PR:
+  SemVer-release-PR:
     needs: build_and_test
     runs-on: ubuntu-latest
     steps:
@@ -59,4 +59,3 @@ jobs:
           command: release-pr
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
