@@ -41,6 +41,7 @@ jobs:
       - uses: google-github-actions/release-please-action@v3
         with:
           command: manifest
+          config-file: .release-please-manifest.json
 #           release-type: rust
 #           package-name: release-please-action ## ${{ vars.REPOSITORY }}
 
