@@ -1,5 +1,9 @@
 name: CI
 
+permissions:
+  pull-requests: write
+  contents: write
+
 on: push
 
 env:
@@ -38,8 +42,14 @@ jobs:
     needs: build_and_test
     runs-on: ubuntu-latest
     steps:
-      - uses: google-github-actions/release-please-action@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
         with:
-          release-type: rust
-          package-name: release-please-action ## ${{ vars.REPOSITORY }}
+          fetch-depth: 0
+      - name: Run release-plz
+        uses: MarcoIeni/release-plz-action@v0.5
+        with:
+          command: release-pr
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
