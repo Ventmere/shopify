@@ -17,14 +17,11 @@ jobs:
     strategy:
       matrix:
         toolchain: [stable, nightly, beta]
-        
     steps:
     - name: Install ${{ matrix.toolchain }}
       run: rustup install ${{ matrix.toolchain }}
-      
     - name: Set toolchain
       run: rustup default ${{ matrix.toolchain }}
-    
     - uses: actions/checkout@v3
     - name: Build
       run: cargo build --verbose
@@ -32,20 +29,19 @@ jobs:
     - name: Run tests
       run: cargo test --verbose
 
-# uncomment to enforce cargo fmt
-#   format:
-#     runs-on: ubuntu-latest
-#     needs: build_and_test
-#     steps:
-#     - uses: actions/checkout@v3
-#     - name: Cargo fmt
-#       run: cargo fmt  ## or use 'cargo ftm --check' to just fail the pipe instead
+  format:
+    runs-on: ubuntu-latest
+    needs: build_and_test
+    steps:
+    - uses: actions/checkout@v3
+    - name: Cargo fmt
+      run: cargo fmt --all --check ## or use 'cargo ftm --check' to just fail the pipe instead
 
-# This commit the code after cargo fmt 
+# This commit the code after cargo fmt --all
 #       - uses: stefanzweifel/git-auto-commit-action@v4
       
 # Maintains CHANGELOG.md, bumps version in cargo.toml and creates PR against current branch
-  SemVer-release-PR:
+  release-PR:
     needs: build_and_test
     runs-on: ubuntu-latest
     steps:
