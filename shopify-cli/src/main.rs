@@ -20,6 +20,7 @@ enum SubCommand {
   OrderGetRisks(OrderGet),
   OrderGetFulfillmentOrders(OrderGet),
   OrderFulfill(OrderFulfill),
+  LocationList,
 }
 
 #[derive(Parser)]
@@ -57,6 +58,7 @@ fn main() {
     }
     SubCommand::OrderList => order_list(&client),
     SubCommand::OrderFulfill(fulfill) => order_fulfill(&client, &fulfill),
+    SubCommand::LocationList => location_list(&client),
   }
 }
 
@@ -160,6 +162,7 @@ fn order_fulfill(client: &Client, fulfill: &OrderFulfill) {
   use shopify::order::*;
 
   let fos = client.get_fulfillment_orders(fulfill.id).unwrap();
+  dbg!(&fos);
   let (fo, li) = fos
     .iter()
     .filter(|fo| fo.status == FulfillmentOrderStatus::Open)
@@ -196,9 +199,9 @@ fn order_fulfill(client: &Client, fulfill: &OrderFulfill) {
     .create_fulfillment(&CreateFulfillmentRequest {
       line_items_by_fulfillment_order: vec![LineItemsByFulfillmentOrder {
         fulfillment_order_id: fo.id,
-        line_items: vec![FulfillmentOrderLineItems {
+        fulfillment_order_line_items: vec![FulfillmentOrderLineItems {
           id: li.id,
-          quantity: None,
+          quantity: 1,
         }],
       }],
       notify_customer: Some(true),
@@ -211,4 +214,10 @@ fn order_fulfill(client: &Client, fulfill: &OrderFulfill) {
     .unwrap();
 
   serde_json::to_writer_pretty(std::io::stdout(), &r).unwrap()
+}
+
+fn location_list(client: &Client,) {
+  use shopify::inventory::LocationApi;
+
+  serde_json::to_writer_pretty(std::io::stdout(), &client.get_list().unwrap()).unwrap()
 }

@@ -77,12 +77,13 @@ pub struct CreateFulfillmentRequest {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LineItemsByFulfillmentOrder {
   pub fulfillment_order_id: i64,
-  pub line_items: Vec<FulfillmentOrderLineItems>,
+  pub fulfillment_order_line_items: Vec<FulfillmentOrderLineItems>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TrackingInfo {
   pub company: String,
   pub number: String,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub url: Option<String>,
 }

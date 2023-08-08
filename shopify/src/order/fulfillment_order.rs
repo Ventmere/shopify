@@ -74,7 +74,7 @@ pub struct MoveFulfillmentOrderRequest {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FulfillmentOrderLineItems {
     pub id: i64,
-    pub quantity: Option<i64>,
+    pub quantity: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
