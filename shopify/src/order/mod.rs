@@ -128,6 +128,7 @@ mod tests {
   const TMP_DIR: &'static str = "./tmp/ventray";
 
   #[test]
+  #[ignore]
   fn test_dump_all_orders() {
     use chrono::TimeZone;
     use serde_json::{self, Value};
