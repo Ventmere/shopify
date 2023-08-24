@@ -1,6 +1,6 @@
 [package]
 name = "shopify"
-version = "0.4.0"
+version = "0.1.6"
 authors = ["fluxxu <fluxxu@gmail.com>"]
 description = "Shopify API Client for Rust."
 license = "MIT"
@@ -19,3 +19,5 @@ parse_link_header = "0.2.1"
 
 [dev-dependencies]
 dotenv = "0.10.1"
+
+## Testing new cicd

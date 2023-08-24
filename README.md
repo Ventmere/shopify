@@ -5,6 +5,7 @@
 
 # shopify
 
+
 Shopify is an unofficial sdk for the Shopify e-commerce platform written in rust.
 
 ## Installation
