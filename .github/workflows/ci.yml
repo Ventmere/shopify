@@ -42,7 +42,7 @@ jobs:
       
 # Maintains CHANGELOG.md, bumps version in cargo.toml and creates PR against current branch
   release-PR:
-    needs: build_and_test
+    needs: format
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
