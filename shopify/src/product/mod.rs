@@ -5,6 +5,7 @@ use serde::Serialize;
 
 mod types;
 pub use self::types::*;
+mod currency_code;
 
 request_query! {
   pub struct GetProductListParams {

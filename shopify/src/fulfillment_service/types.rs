@@ -18,7 +18,7 @@ impl AsRef<str> for FulfillmentServiceScope {
 
 /// A Fulfillment Service is a third party warehouse that prepares and ships orders on behalf of the store owner. Fulfillment services charge a fee to package and ship items and update product inventory levels. Some well known fulfillment services with Shopify integrations include: Amazon, Shipwire, and Rakuten. When an app registers a new FulfillmentService on a store, Shopify automatically creates a Location that's associated to the fulfillment service. To learn more about fulfillment services, refer to Manage fulfillments as a fulfillment service app guide.
 /// https://shopify.dev/docs/api/admin-graphql/2023-10/objects/FulfillmentService
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct FulfillmentService {
   /// The callback URL that the fulfillment service has registered for requests. The following considerations apply:
   ///
@@ -84,3 +84,4 @@ pub enum FulfillmentServiceType {
   Manual,
   ThirdParty,
 }
+

@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use serde_json::Value;
 
-use crate::{fulfillment_service::FulfillmentService, delivery_profile::types::DeliveryLocalPickupSettings};
+use crate::{fulfillment_service::FulfillmentService, delivery_profile::types::DeliveryLocalPickupSettings, product::Metafield};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Location {
@@ -64,6 +64,29 @@ pub struct LocationAddress {
   pub longitude: Option<f64>,
   /// The phone number of the location.
   pub phone: Option<String>,
+}
+
+/// Represents the address of a location.
+#[derive(Debug, Serialize, Deserialize)]
+pub struct LocationSuggestedAddress {
+  /// The first line of the address for the location.
+  pub address1: Option<String>,
+  /// The second line of the address for the location.
+  pub address2: Option<String>,
+  /// The city of the location.
+  pub city: Option<String>,
+  /// The ZIP code of the location.
+  pub zip: Option<String>,
+  /// The province of the location.
+  pub province: Option<String>,
+  /// The code for the province, state, or district of the address of the location.
+  pub province_code: Option<String>,
+  /// The country of the location.
+  pub country: Option<String>,
+  /// The country code of the location.
+  pub country_code: Option<String>,
+  /// A formatted version of the address for the location.
+  pub formatted: Vec<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
