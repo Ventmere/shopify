@@ -15,3 +15,4 @@ pub mod pagination;
 pub mod product;
 pub mod shop;
 pub mod variant;
+pub mod delivery_profile;
