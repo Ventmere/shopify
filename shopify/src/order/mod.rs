@@ -40,6 +40,8 @@ pub trait OrderApi {
   fn move_fulfillment_order(&self, fulfillment_order_id: i64, move_fulfillment_order: &MoveFulfillmentOrderRequest) -> ShopifyResult<MoveFulfillmentOrderResponse>;
 
   fn create_fulfillment(&self, fulfillment: &CreateFulfillmentRequest) -> ShopifyResult<Fulfillment>;
+
+  fn update_fulfillment_tracking(&self, fulfillment_id: i64, tracking_info: &TrackingInfo, notify_customer: bool) -> ShopifyResult<Fulfillment>;
 }
 
 impl OrderApi for Client {
@@ -115,6 +117,23 @@ impl OrderApi for Client {
     let res: Res = self.request(Method::POST, "/admin/api/2023-04/fulfillments.json", move |b| {
       b.json(&serde_json::json!({
         "fulfillment": fulfillment,
+      }))
+    })?;
+    Ok(res.into_inner())
+  }
+
+  fn update_fulfillment_tracking(&self, fulfillment_id: i64, tracking_info: &TrackingInfo, notify_customer: bool) -> ShopifyResult<Fulfillment> {
+    shopify_wrap! {
+      pub struct Res {
+        fulfillment: Fulfillment,
+      }
+    }
+    let res: Res = self.request(Method::POST, &format!("/admin/api/2023-01/fulfillments/{}/update_tracking.json", fulfillment_id), move |b| {
+      b.json(&serde_json::json!({
+        "fulfillment": {
+          "tracking_info": tracking_info,
+          "notify_customer": notify_customer,
+        }
       }))
     })?;
     Ok(res.into_inner())

@@ -206,7 +206,7 @@ pub struct Order {
   pub discount_codes: Vec<DiscountCode>,
   pub note_attributes: Vec<Property>,
   pub payment_gateway_names: Vec<String>,
-  pub processing_method: String,
+  pub processing_method: Option<String>,
   pub checkout_id: Value,
   pub source_name: String,
   pub fulfillment_status: Option<FulfillmentStatus>,

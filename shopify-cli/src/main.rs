@@ -20,6 +20,7 @@ enum SubCommand {
   OrderGetRisks(OrderGet),
   OrderGetFulfillmentOrders(OrderGet),
   OrderFulfill(OrderFulfill),
+  OrderFulfillmentUpdateTracking(OrderFulfillmentUpdateTracking),
   LocationList,
 }
 
@@ -33,6 +34,13 @@ struct OrderFulfill {
   id: i64,
   item_id: i64,
   location_id: i64,
+  carrier: String,
+  tracking_number: String,
+}
+
+#[derive(Parser)]
+struct OrderFulfillmentUpdateTracking {
+  id: i64,
   carrier: String,
   tracking_number: String,
 }
@@ -58,6 +66,9 @@ fn main() {
     }
     SubCommand::OrderList => order_list(&client),
     SubCommand::OrderFulfill(fulfill) => order_fulfill(&client, &fulfill),
+    SubCommand::OrderFulfillmentUpdateTracking(update) => {
+      order_fulfillment_update_tracking(&client, &update)
+    }
     SubCommand::LocationList => location_list(&client),
   }
 }
@@ -214,6 +225,15 @@ fn order_fulfill(client: &Client, fulfill: &OrderFulfill) {
     .unwrap();
 
   serde_json::to_writer_pretty(std::io::stdout(), &r).unwrap()
+}
+
+fn order_fulfillment_update_tracking(client: &Client, update: &OrderFulfillmentUpdateTracking) {
+  use shopify::order::*;
+  client.update_fulfillment_tracking(update.id, &TrackingInfo {
+    number: update.tracking_number.clone(),
+    company: update.carrier.clone(),
+    url: None,
+  }, true).unwrap();
 }
 
 fn location_list(client: &Client,) {
