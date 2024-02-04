@@ -1,5 +1,5 @@
 #[doc(hidden)]
-pub trait ShopifyWarpper<T> {
+pub trait ShopifyWrapper<T> {
   fn into_inner(self) -> T;
 }
 
