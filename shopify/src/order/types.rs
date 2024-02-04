@@ -5,7 +5,8 @@ use crate::types::{DateTime, Utc, Value};
 pub enum FulfillmentStatus {
   Fulfilled,
   Partial,
-  Restocked
+  Restocked,
+  NotEligible,
 }
 
 #[derive(Debug, Serialize, Deserialize, Copy, Clone, PartialEq)]
