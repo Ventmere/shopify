@@ -54,6 +54,8 @@ pub trait OrderApi {
     tracking_info: &TrackingInfo,
     notify_customer: bool,
   ) -> ShopifyResult<Fulfillment>;
+
+  fn update_order(&self, order: &Order, update_params: OrderUpdateParams) -> ShopifyResult<Order>;
 }
 
 impl OrderApi for Client {
@@ -179,6 +181,37 @@ impl OrderApi for Client {
     )?;
     Ok(res.into_inner())
   }
+
+  fn update_order(&self, order: &Order, update_params: OrderUpdateParams) -> ShopifyResult<Order> {
+    let order_update_request_params = OrderUpdateRequestParams {
+      order_id: order.id,
+      buyer_accepts_marketing: update_params
+        .buyer_accepts_marketing
+        .unwrap_or(order.buyer_accepts_marketing),
+      email: update_params.email,
+      phone: update_params.phone,
+      note: update_params.note,
+      tags: update_params.tags,
+      shipping_address: update_params.shipping_address,
+    };
+    shopify_wrap! {
+      pub struct Res {
+        order: Order,
+      }
+    }
+    let res: Res = self.request(
+      Method::PUT,
+      &format!("/admin/api/2023-04/orders/{}.json", order.id),
+      move |b| {
+        b.json(&serde_json::json!(
+          {
+            "order": order_update_request_params
+          }
+        ))
+      },
+    )?;
+    Ok(res.into_inner())
+  }
 }
 
 #[cfg(test)]
@@ -272,5 +305,34 @@ mod tests {
 
       chunk += 1;
     }
+  }
+
+  #[test]
+  #[ignore]
+  /// Add a `test_tag` tag to an order for which the ID is passed through the `ORDER_ID` env var.
+  fn test_add_order_tag() {
+    use std::env::var;
+    ::dotenv::dotenv().ok();
+
+    let order_id: i64 = var("ORDER_ID").unwrap().parse().unwrap();
+    let client = crate::client::get_test_client();
+
+    // Get current tags.
+    let order = client.get(order_id).unwrap();
+    println!("Old tags: {}", order.tags);
+
+    // Update tag.
+    let new_tags = format!("{}, test_tag", order.tags);
+    let update_params = OrderUpdateParams {
+      buyer_accepts_marketing: None,
+      email: None,
+      phone: None,
+      note: None,
+      tags: Some(new_tags),
+      shipping_address: None,
+    };
+    let updated_order = client.update_order(&order, update_params).unwrap();
+
+    println!("Updated tags: {}", updated_order.tags);
   }
 }

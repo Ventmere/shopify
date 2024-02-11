@@ -277,3 +277,29 @@ pub struct OrderRisk {
   pub score: Option<String>,
   pub source: String,
 }
+
+#[derive(Debug, Serialize)]
+pub struct OrderUpdateParams {
+  pub buyer_accepts_marketing: Option<bool>,
+  pub email: Option<String>,
+  pub phone: Option<String>,
+  pub note: Option<String>,
+  pub tags: Option<String>,
+  pub shipping_address: Option<Address>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct OrderUpdateRequestParams {
+  pub order_id: i64,
+  pub buyer_accepts_marketing: bool,
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub email: Option<String>,
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub phone: Option<String>,
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub note: Option<String>,
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub tags: Option<String>,
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub shipping_address: Option<Address>,
+}
