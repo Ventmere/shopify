@@ -87,15 +87,11 @@ fn product_list(client: &Client) {
 
   all.extend(page.payload);
 
-  loop {
-    if let Some(params) = next {
-      let page = client.list_page(&params).unwrap();
-      next = page.get_next();
+  while let Some(params) = next {
+    let page = client.list_page(&params).unwrap();
+    next = page.get_next();
 
-      all.extend(page.payload);
-    } else {
-      break;
-    }
+    all.extend(page.payload);
   }
 
   serde_json::to_writer_pretty(std::io::stdout(), &all).unwrap()
@@ -116,15 +112,11 @@ fn variant_list(client: &Client) {
 
   all.extend(page.payload);
 
-  loop {
-    if let Some(params) = next {
-      let page = client.list_page(&params).unwrap();
-      next = page.get_next();
+  while let Some(params) = next {
+    let page = client.list_page(&params).unwrap();
+    next = page.get_next();
 
-      all.extend(page.payload);
-    } else {
-      break;
-    }
+    all.extend(page.payload);
   }
 
   serde_json::to_writer_pretty(std::io::stdout(), &all).unwrap()
@@ -171,15 +163,10 @@ fn order_fulfill(client: &Client, fulfill: &OrderFulfill) {
     .iter()
     .filter(|fo| fo.status == FulfillmentOrderStatus::Open)
     .find_map(|fo| {
-      if let Some(li) = fo
-        .line_items
+      fo.line_items
         .iter()
         .find(|li| li.line_item_id == fulfill.item_id)
-      {
-        Some((fo, li))
-      } else {
-        None
-      }
+        .map(|li| (fo, li))
     })
     .expect("No matching fulfillment order");
   if fo.assigned_location_id != Some(fulfill.location_id) {

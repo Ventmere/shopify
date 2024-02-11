@@ -17,7 +17,7 @@ macro_rules! shopify_wrap {
       $key:ident: $inner_t:ty$(,)*
     }
   ) => {
-    use crate::client::ShopifyWrapper;
+    use $crate::client::ShopifyWrapper;
 
     #[derive(Debug, Deserialize)]
     pub struct $t {
@@ -84,7 +84,7 @@ macro_rules! request_query {
       $(,)*
     }
   ) => (
-    use crate::client::{ShopifyRequestQuery, AsQueryValue};
+    use $crate::client::{ShopifyRequestQuery, AsQueryValue};
 
     #[derive(Debug, Default)]
     pub struct $t {
@@ -142,7 +142,7 @@ impl Client {
       base_url: Url::parse(base_url)?,
       api_key: api_key.to_owned(),
       password: password.to_owned(),
-      client: client,
+      client,
     })
   }
 
@@ -219,7 +219,7 @@ impl Client {
       });
     }
 
-    Ok(Paginated::from_res(res)?)
+    Paginated::from_res(res)
   }
 
   pub fn request<T, F>(&self, method: Method, path: &str, bf: F) -> ShopifyResult<T>

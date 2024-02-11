@@ -24,7 +24,7 @@ impl ShopifyRequestQuery for GetPage {
   fn as_query_pairs(&self) -> Vec<(String, String)> {
     let mut pairs = vec![("page_info".to_string(), self.page_info.clone())];
 
-    if let Some(limit) = self.limit.clone() {
+    if let Some(limit) = self.limit {
       pairs.push(("limit".to_string(), limit.to_string()))
     }
 

@@ -10,7 +10,7 @@ pub struct FulfillmentOrder {
   pub fulfillment_holds: Option<Vec<Option<serde_json::Value>>>,
   pub id: i64,
   pub international_duties: Option<serde_json::Value>,
-  pub line_items: Vec<LineItem>,
+  pub line_items: Vec<FulfillmentOrderLineItem>,
   pub merchant_requests: Option<Vec<Option<serde_json::Value>>>,
   pub order_id: Option<i64>,
   pub request_status: Option<String>,
@@ -54,7 +54,7 @@ pub struct DeliveryMethod {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct LineItem {
+pub struct FulfillmentOrderLineItem {
   pub fulfillable_quantity: Option<i64>,
   pub fulfillment_order_id: Option<i64>,
   pub id: i64,

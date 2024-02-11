@@ -187,7 +187,7 @@ mod tests {
 
   use super::*;
 
-  const TMP_DIR: &'static str = "./tmp/ventray";
+  const TMP_DIR: &str = "./tmp/ventray";
 
   #[test]
   #[ignore]
@@ -203,10 +203,12 @@ mod tests {
     }
 
     let client = crate::client::get_test_client();
-    let mut params = GetOrderListParams::default();
-    params.limit = Some(250);
-    params.status = Some("any".to_owned());
-    params.created_at_min = Some(Utc.with_ymd_and_hms(2021, 5, 6, 18, 11, 0).unwrap());
+    let params = GetOrderListParams {
+      limit: Some(250),
+      status: Some("any".to_owned()),
+      created_at_min: Some(Utc.with_ymd_and_hms(2021, 5, 6, 18, 11, 0).unwrap()),
+      ..Default::default()
+    };
     let mut page = 1;
     loop {
       println!("Downloading page {}", page);
@@ -231,7 +233,7 @@ mod tests {
       let f = File::create(format!("{}/order_{}.json", TMP_DIR, page)).unwrap();
       serde_json::to_writer_pretty(f, &orders).unwrap();
 
-      page = page + 1;
+      page += 1;
       std::thread::sleep(Duration::from_millis(500));
     }
   }
@@ -268,7 +270,7 @@ mod tests {
         println!("testing order {}: {} of {}", id, i + 1, total);
       }
 
-      chunk = chunk + 1;
+      chunk += 1;
     }
   }
 }

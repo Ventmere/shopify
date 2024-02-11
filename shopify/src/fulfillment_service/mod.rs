@@ -56,7 +56,7 @@ impl FulfillmentServiceApi for Client {
       }
     }
     let path = "/admin/fulfillment_services.json";
-    let res: Res = self.request(Method::POST, &path, move |b| {
+    let res: Res = self.request(Method::POST, path, move |b| {
       b.json(&json!({ "fulfillment_service": fulfillment_service }))
     })?;
     Ok(res.into_inner())
@@ -148,8 +148,10 @@ mod tests {
   #[ignore]
   fn test_fulfillment_service_update() {
     let client = crate::client::get_test_client();
-    let mut update = UpdateFulfillmentService::default();
-    update.name = Some("Ventmere S2".to_owned());
+    let update = UpdateFulfillmentService {
+      name: Some("Ventmere S2".to_owned()),
+      ..Default::default()
+    };
     let service = client.update(13008909, &update).unwrap();
     println!("{:#?}", service);
   }
