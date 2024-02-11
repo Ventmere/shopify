@@ -82,7 +82,6 @@ mod tests {
   #[test]
   #[ignore]
   fn test_location_get_list() {
-    use super::LocationApi;
     let client = create_test_client();
     let list = inventory::LocationApi::get_list(&client).unwrap();
     println!("{:#?}", list);
@@ -91,7 +90,7 @@ mod tests {
   #[test]
   #[ignore]
   fn test_inventory_level_get_list() {
-    use super::{GetInventoryLevelsParams, InventoryLevelApi};
+    use super::GetInventoryLevelsParams;
     let client = create_test_client();
     let list = inventory::InventoryLevelApi::get_list(
       &client,

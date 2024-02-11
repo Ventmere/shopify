@@ -1,5 +1,4 @@
 use clap::Parser;
-use serde_json;
 use shopify::client::Client;
 use std::env::var;
 
@@ -158,12 +157,6 @@ fn order_get_fulfillment_orders(client: &Client, id: i64) {
 fn order_list(client: &Client) {
   use shopify::order::*;
 
-  #[derive(serde::Deserialize)]
-  struct P {
-    orders: Vec<Order>,
-  }
-  let orders: P = serde_json::from_reader(std::fs::File::open("1.json").unwrap()).unwrap();
-
   let orders = client.get_list(&Default::default()).unwrap();
 
   serde_json::to_writer_pretty(std::io::stdout(), &orders).unwrap()
@@ -177,7 +170,7 @@ fn order_fulfill(client: &Client, fulfill: &OrderFulfill) {
   let (fo, li) = fos
     .iter()
     .filter(|fo| fo.status == FulfillmentOrderStatus::Open)
-    .filter_map(|fo| {
+    .find_map(|fo| {
       if let Some(li) = fo
         .line_items
         .iter()
@@ -188,7 +181,6 @@ fn order_fulfill(client: &Client, fulfill: &OrderFulfill) {
         None
       }
     })
-    .next()
     .expect("No matching fulfillment order");
   if fo.assigned_location_id != Some(fulfill.location_id) {
     println!(

@@ -183,6 +183,8 @@ impl OrderApi for Client {
 
 #[cfg(test)]
 mod tests {
+  use std::time::Duration;
+
   use super::*;
 
   const TMP_DIR: &'static str = "./tmp/ventray";
@@ -204,7 +206,7 @@ mod tests {
     let mut params = GetOrderListParams::default();
     params.limit = Some(250);
     params.status = Some("any".to_owned());
-    params.created_at_min = Some(Utc.ymd(2021, 5, 6).and_hms(18, 11, 0));
+    params.created_at_min = Some(Utc.with_ymd_and_hms(2021, 5, 6, 18, 11, 0).unwrap());
     let mut page = 1;
     loop {
       println!("Downloading page {}", page);
@@ -230,7 +232,7 @@ mod tests {
       serde_json::to_writer_pretty(f, &orders).unwrap();
 
       page = page + 1;
-      ::std::thread::sleep_ms(500);
+      std::thread::sleep(Duration::from_millis(500));
     }
   }
 
@@ -262,7 +264,7 @@ mod tests {
         let as_str = serde_json::to_string_pretty(&order).unwrap();
         let mut current = fs::File::create(format!("{}/current_order.json", TMP_DIR)).unwrap();
         write!(&mut current, "{}", &as_str).unwrap();
-        let order: Order = serde_json::from_str(&as_str).unwrap();
+        assert!(serde_json::from_str::<Order>(&as_str).is_ok());
         println!("testing order {}: {} of {}", id, i + 1, total);
       }
 
