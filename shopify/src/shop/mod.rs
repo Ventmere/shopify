@@ -84,7 +84,8 @@ mod tests {
       }
     }
     "##,
-    ).unwrap();
+    )
+    .unwrap();
   }
 
   #[test]

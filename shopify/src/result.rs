@@ -6,9 +6,7 @@ pub enum ShopifyError {
   #[error("not found")]
   NotFound,
 
-  #[error(
-    "request error: path = '{path}', status = '{status}', body = '{body}'"
-  )]
+  #[error("request error: path = '{path}', status = '{status}', body = '{body}'")]
   Request {
     path: String,
     status: StatusCode,

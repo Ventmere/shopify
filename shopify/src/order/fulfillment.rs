@@ -1,4 +1,4 @@
-use super::FulfillmentOrderLineItems;
+use crate::order::fulfillment_order::FulfillmentOrderLineItems;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Fulfillment {

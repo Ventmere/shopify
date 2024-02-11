@@ -1,5 +1,4 @@
 use clap::Parser;
-use serde_json;
 use shopify::client::Client;
 use std::env::var;
 
@@ -88,15 +87,11 @@ fn product_list(client: &Client) {
 
   all.extend(page.payload);
 
-  loop {
-    if let Some(params) = next {
-      let page = client.list_page(&params).unwrap();
-      next = page.get_next();
+  while let Some(params) = next {
+    let page = client.list_page(&params).unwrap();
+    next = page.get_next();
 
-      all.extend(page.payload);
-    } else {
-      break;
-    }
+    all.extend(page.payload);
   }
 
   serde_json::to_writer_pretty(std::io::stdout(), &all).unwrap()
@@ -117,15 +112,11 @@ fn variant_list(client: &Client) {
 
   all.extend(page.payload);
 
-  loop {
-    if let Some(params) = next {
-      let page = client.list_page(&params).unwrap();
-      next = page.get_next();
+  while let Some(params) = next {
+    let page = client.list_page(&params).unwrap();
+    next = page.get_next();
 
-      all.extend(page.payload);
-    } else {
-      break;
-    }
+    all.extend(page.payload);
   }
 
   serde_json::to_writer_pretty(std::io::stdout(), &all).unwrap()
@@ -158,12 +149,6 @@ fn order_get_fulfillment_orders(client: &Client, id: i64) {
 fn order_list(client: &Client) {
   use shopify::order::*;
 
-  #[derive(serde::Deserialize)]
-  struct P {
-    orders: Vec<Order>,
-  }
-  let orders: P = serde_json::from_reader(std::fs::File::open("1.json").unwrap()).unwrap();
-
   let orders = client.get_list(&Default::default()).unwrap();
 
   serde_json::to_writer_pretty(std::io::stdout(), &orders).unwrap()
@@ -177,18 +162,12 @@ fn order_fulfill(client: &Client, fulfill: &OrderFulfill) {
   let (fo, li) = fos
     .iter()
     .filter(|fo| fo.status == FulfillmentOrderStatus::Open)
-    .filter_map(|fo| {
-      if let Some(li) = fo
-        .line_items
+    .find_map(|fo| {
+      fo.line_items
         .iter()
         .find(|li| li.line_item_id == fulfill.item_id)
-      {
-        Some((fo, li))
-      } else {
-        None
-      }
+        .map(|li| (fo, li))
     })
-    .next()
     .expect("No matching fulfillment order");
   if fo.assigned_location_id != Some(fulfill.location_id) {
     println!(
@@ -220,7 +199,7 @@ fn order_fulfill(client: &Client, fulfill: &OrderFulfill) {
         number: fulfill.tracking_number.clone(),
         company: fulfill.carrier.clone(),
         url: None,
-      })
+      }),
     })
     .unwrap();
 
@@ -229,14 +208,20 @@ fn order_fulfill(client: &Client, fulfill: &OrderFulfill) {
 
 fn order_fulfillment_update_tracking(client: &Client, update: &OrderFulfillmentUpdateTracking) {
   use shopify::order::*;
-  client.update_fulfillment_tracking(update.id, &TrackingInfo {
-    number: update.tracking_number.clone(),
-    company: update.carrier.clone(),
-    url: None,
-  }, true).unwrap();
+  client
+    .update_fulfillment_tracking(
+      update.id,
+      &TrackingInfo {
+        number: update.tracking_number.clone(),
+        company: update.carrier.clone(),
+        url: None,
+      },
+      true,
+    )
+    .unwrap();
 }
 
-fn location_list(client: &Client,) {
+fn location_list(client: &Client) {
   use shopify::inventory::LocationApi;
 
   serde_json::to_writer_pretty(std::io::stdout(), &client.get_list().unwrap()).unwrap()

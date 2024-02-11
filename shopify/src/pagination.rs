@@ -24,7 +24,7 @@ impl ShopifyRequestQuery for GetPage {
   fn as_query_pairs(&self) -> Vec<(String, String)> {
     let mut pairs = vec![("page_info".to_string(), self.page_info.clone())];
 
-    if let Some(limit) = self.limit.clone() {
+    if let Some(limit) = self.limit {
       pairs.push(("limit".to_string(), limit.to_string()))
     }
 
@@ -49,11 +49,11 @@ impl<T> Paginated<T> {
   {
     let mut previous_url = None;
     let mut next_url = None;
-    if let Some(link) = res.headers().get("link")
-      .and_then(|v| v.to_str().ok().and_then(|v| {
-        parse_link_header::parse(v).ok()
-      }))
-    {
+    if let Some(link) = res.headers().get("link").and_then(|v| {
+      v.to_str()
+        .ok()
+        .and_then(|v| parse_link_header::parse(v).ok())
+    }) {
       for (k, v) in link {
         if let Some(rel) = k {
           if rel == "prev" {
