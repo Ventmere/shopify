@@ -1,10 +1,10 @@
 use crate::pagination::Paginated;
-pub use reqwest::Method;
-use reqwest::blocking::Response;
-use reqwest::{blocking::Client as HttpClient, blocking::RequestBuilder, StatusCode, Url};
 use crate::result::*;
-use serde::Deserialize;
 use crate::types::{DateTime, Utc};
+use reqwest::blocking::Response;
+pub use reqwest::Method;
+use reqwest::{blocking::Client as HttpClient, blocking::RequestBuilder, StatusCode, Url};
+use serde::Deserialize;
 
 mod types;
 pub use self::types::*;

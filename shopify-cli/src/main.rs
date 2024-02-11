@@ -220,7 +220,7 @@ fn order_fulfill(client: &Client, fulfill: &OrderFulfill) {
         number: fulfill.tracking_number.clone(),
         company: fulfill.carrier.clone(),
         url: None,
-      })
+      }),
     })
     .unwrap();
 
@@ -229,14 +229,20 @@ fn order_fulfill(client: &Client, fulfill: &OrderFulfill) {
 
 fn order_fulfillment_update_tracking(client: &Client, update: &OrderFulfillmentUpdateTracking) {
   use shopify::order::*;
-  client.update_fulfillment_tracking(update.id, &TrackingInfo {
-    number: update.tracking_number.clone(),
-    company: update.carrier.clone(),
-    url: None,
-  }, true).unwrap();
+  client
+    .update_fulfillment_tracking(
+      update.id,
+      &TrackingInfo {
+        number: update.tracking_number.clone(),
+        company: update.carrier.clone(),
+        url: None,
+      },
+      true,
+    )
+    .unwrap();
 }
 
-fn location_list(client: &Client,) {
+fn location_list(client: &Client) {
   use shopify::inventory::LocationApi;
 
   serde_json::to_writer_pretty(std::io::stdout(), &client.get_list().unwrap()).unwrap()

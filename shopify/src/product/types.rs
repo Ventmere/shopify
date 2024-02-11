@@ -1,6 +1,6 @@
-use serde_json::Value;
 use crate::types::{DateTime, Utc};
 pub use crate::variant::Variant;
+use serde_json::Value;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Product {

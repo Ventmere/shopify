@@ -37,11 +37,23 @@ pub trait OrderApi {
 
   fn get_fulfillment_orders(&self, order_id: i64) -> ShopifyResult<Vec<FulfillmentOrder>>;
 
-  fn move_fulfillment_order(&self, fulfillment_order_id: i64, move_fulfillment_order: &MoveFulfillmentOrderRequest) -> ShopifyResult<MoveFulfillmentOrderResponse>;
+  fn move_fulfillment_order(
+    &self,
+    fulfillment_order_id: i64,
+    move_fulfillment_order: &MoveFulfillmentOrderRequest,
+  ) -> ShopifyResult<MoveFulfillmentOrderResponse>;
 
-  fn create_fulfillment(&self, fulfillment: &CreateFulfillmentRequest) -> ShopifyResult<Fulfillment>;
+  fn create_fulfillment(
+    &self,
+    fulfillment: &CreateFulfillmentRequest,
+  ) -> ShopifyResult<Fulfillment>;
 
-  fn update_fulfillment_tracking(&self, fulfillment_id: i64, tracking_info: &TrackingInfo, notify_customer: bool) -> ShopifyResult<Fulfillment>;
+  fn update_fulfillment_tracking(
+    &self,
+    fulfillment_id: i64,
+    tracking_info: &TrackingInfo,
+    notify_customer: bool,
+  ) -> ShopifyResult<Fulfillment>;
 }
 
 impl OrderApi for Client {
@@ -52,7 +64,12 @@ impl OrderApi for Client {
       }
     }
 
-    let res: Res = self.request_with_params(Method::GET, "/admin/orders.json", params, std::convert::identity)?;
+    let res: Res = self.request_with_params(
+      Method::GET,
+      "/admin/orders.json",
+      params,
+      std::convert::identity,
+    )?;
     Ok(res.into_inner())
   }
 
@@ -63,7 +80,11 @@ impl OrderApi for Client {
       }
     }
 
-    let res: Res = self.request(Method::GET, &format!("/admin/orders/{}.json", id), std::convert::identity)?;
+    let res: Res = self.request(
+      Method::GET,
+      &format!("/admin/orders/{}.json", id),
+      std::convert::identity,
+    )?;
     Ok(res.into_inner())
   }
 
@@ -73,10 +94,7 @@ impl OrderApi for Client {
         risks: Vec<OrderRisk>,
       }
     }
-    let path = format!(
-      "/admin/orders/{order_id}/risks.json",
-      order_id = order_id
-    );
+    let path = format!("/admin/orders/{order_id}/risks.json", order_id = order_id);
     let res: Res = self.request(Method::GET, &path, std::convert::identity)?;
     Ok(res.into_inner())
   }
@@ -95,7 +113,11 @@ impl OrderApi for Client {
     Ok(res.into_inner())
   }
 
-  fn move_fulfillment_order(&self, fulfillment_order_id: i64, move_fulfillment_order: &MoveFulfillmentOrderRequest) -> ShopifyResult<MoveFulfillmentOrderResponse> {
+  fn move_fulfillment_order(
+    &self,
+    fulfillment_order_id: i64,
+    move_fulfillment_order: &MoveFulfillmentOrderRequest,
+  ) -> ShopifyResult<MoveFulfillmentOrderResponse> {
     let path = format!(
       "/admin/api/2023-04/fulfillment_orders/{id}/move.json",
       id = fulfillment_order_id,
@@ -108,34 +130,53 @@ impl OrderApi for Client {
     Ok(res)
   }
 
-  fn create_fulfillment(&self, fulfillment: &CreateFulfillmentRequest) -> ShopifyResult<Fulfillment> {
+  fn create_fulfillment(
+    &self,
+    fulfillment: &CreateFulfillmentRequest,
+  ) -> ShopifyResult<Fulfillment> {
     shopify_wrap! {
       pub struct Res {
         fulfillment: Fulfillment,
       }
     }
-    let res: Res = self.request(Method::POST, "/admin/api/2023-04/fulfillments.json", move |b| {
-      b.json(&serde_json::json!({
-        "fulfillment": fulfillment,
-      }))
-    })?;
+    let res: Res = self.request(
+      Method::POST,
+      "/admin/api/2023-04/fulfillments.json",
+      move |b| {
+        b.json(&serde_json::json!({
+          "fulfillment": fulfillment,
+        }))
+      },
+    )?;
     Ok(res.into_inner())
   }
 
-  fn update_fulfillment_tracking(&self, fulfillment_id: i64, tracking_info: &TrackingInfo, notify_customer: bool) -> ShopifyResult<Fulfillment> {
+  fn update_fulfillment_tracking(
+    &self,
+    fulfillment_id: i64,
+    tracking_info: &TrackingInfo,
+    notify_customer: bool,
+  ) -> ShopifyResult<Fulfillment> {
     shopify_wrap! {
       pub struct Res {
         fulfillment: Fulfillment,
       }
     }
-    let res: Res = self.request(Method::POST, &format!("/admin/api/2023-01/fulfillments/{}/update_tracking.json", fulfillment_id), move |b| {
-      b.json(&serde_json::json!({
-        "fulfillment": {
-          "tracking_info": tracking_info,
-          "notify_customer": notify_customer,
-        }
-      }))
-    })?;
+    let res: Res = self.request(
+      Method::POST,
+      &format!(
+        "/admin/api/2023-01/fulfillments/{}/update_tracking.json",
+        fulfillment_id
+      ),
+      move |b| {
+        b.json(&serde_json::json!({
+          "fulfillment": {
+            "tracking_info": tracking_info,
+            "notify_customer": notify_customer,
+          }
+        }))
+      },
+    )?;
     Ok(res.into_inner())
   }
 }
@@ -169,7 +210,12 @@ mod tests {
       println!("Downloading page {}", page);
 
       let orders = client
-        .request_with_params::<_, RawOrders, _>(Method::GET, "/admin/orders.json", &params, std::convert::identity)
+        .request_with_params::<_, RawOrders, _>(
+          Method::GET,
+          "/admin/orders.json",
+          &params,
+          std::convert::identity,
+        )
         .unwrap()
         .into_inner();
 
@@ -179,7 +225,6 @@ mod tests {
 
       let id = orders.last().unwrap().get("id").unwrap().as_i64().unwrap();
       println!("count = {}, last_id = {}", orders.len(), id);
-
 
       let f = File::create(format!("{}/order_{}.json", TMP_DIR, page)).unwrap();
       serde_json::to_writer_pretty(f, &orders).unwrap();

@@ -1,5 +1,5 @@
-use crate::pagination::{GetPage, Paginated};
 use crate::client::{Client, Method};
+use crate::pagination::{GetPage, Paginated};
 use crate::result::*;
 use serde::Serialize;
 

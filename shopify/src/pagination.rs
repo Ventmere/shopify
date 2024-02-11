@@ -49,11 +49,11 @@ impl<T> Paginated<T> {
   {
     let mut previous_url = None;
     let mut next_url = None;
-    if let Some(link) = res.headers().get("link")
-      .and_then(|v| v.to_str().ok().and_then(|v| {
-        parse_link_header::parse(v).ok()
-      }))
-    {
+    if let Some(link) = res.headers().get("link").and_then(|v| {
+      v.to_str()
+        .ok()
+        .and_then(|v| parse_link_header::parse(v).ok())
+    }) {
       for (k, v) in link {
         if let Some(rel) = k {
           if rel == "prev" {

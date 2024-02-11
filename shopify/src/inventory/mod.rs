@@ -54,8 +54,12 @@ impl InventoryLevelApi for Client {
       }
     }
 
-    let res: Res =
-      self.request_with_params(Method::GET, "/admin/inventory_levels.json", params, std::convert::identity)?;
+    let res: Res = self.request_with_params(
+      Method::GET,
+      "/admin/inventory_levels.json",
+      params,
+      std::convert::identity,
+    )?;
     Ok(res.into_inner())
   }
 }
@@ -63,8 +67,8 @@ impl InventoryLevelApi for Client {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use std::env::var;
   use crate::inventory;
+  use std::env::var;
 
   fn create_test_client() -> Client {
     dotenv::dotenv().ok();
@@ -73,7 +77,7 @@ mod tests {
       &var("SHOPIFY_API_KEY").unwrap(),
       &var("SHOPIFY_PASSWORD").unwrap(),
     )
-        .unwrap()
+    .unwrap()
   }
   #[test]
   #[ignore]
@@ -91,10 +95,12 @@ mod tests {
     let client = create_test_client();
     let list = inventory::InventoryLevelApi::get_list(
       &client,
-       &GetInventoryLevelsParams {
+      &GetInventoryLevelsParams {
         inventory_item_ids: Some(vec![2819391175, 5746930631]),
         ..Default::default()
-      }).unwrap();
+      },
+    )
+    .unwrap();
     println!("{:#?}", list);
   }
 }
