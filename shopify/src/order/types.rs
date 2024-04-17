@@ -31,7 +31,8 @@ pub enum ShipmentStatus {
   Delivered,
   Failure,
   LabelPrinted,
-  Delayed
+  Delayed,
+  ReadyForPickup
 }
 
 #[derive(Debug, Serialize, Deserialize)]
