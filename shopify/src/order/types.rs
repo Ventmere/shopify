@@ -31,6 +31,7 @@ pub enum ShipmentStatus {
   Delivered,
   Failure,
   LabelPrinted,
+  Delayed
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -252,7 +253,7 @@ pub struct ShippingLines {
   pub source: Option<String>,
   pub phone: Option<String>,
   pub requested_fulfillment_service_id: Value,
-  pub delivery_category: Value,
+  pub delivery_category: Option<Value>,
   pub carrier_identifier: Value,
   pub discounted_price: String,
   pub tax_lines: Vec<TaxLines>,
