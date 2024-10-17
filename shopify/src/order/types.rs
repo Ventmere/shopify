@@ -68,7 +68,7 @@ pub struct ClientDetails {
 pub struct Customer {
   pub id: i64,
   pub email: Option<String>,
-  pub accepts_marketing: bool,
+  pub accepts_marketing: Option<bool>,
   pub created_at: String,
   pub updated_at: String,
   pub first_name: Option<String>,
@@ -185,7 +185,7 @@ pub struct Order {
   pub total_discounts: String,
   pub total_line_items_price: String,
   pub cart_token: Option<String>,
-  pub buyer_accepts_marketing: bool,
+  pub buyer_accepts_marketing: Option<bool>,
   pub name: String,
   pub referring_site: Value,
   pub landing_site: Value,
@@ -293,7 +293,7 @@ pub struct OrderUpdateParams {
 #[derive(Debug, Serialize)]
 pub struct OrderUpdateRequestParams {
   pub order_id: i64,
-  pub buyer_accepts_marketing: bool,
+  pub buyer_accepts_marketing: Option<bool>,
   #[serde(skip_serializing_if = "Option::is_none")]
   pub email: Option<String>,
   #[serde(skip_serializing_if = "Option::is_none")]

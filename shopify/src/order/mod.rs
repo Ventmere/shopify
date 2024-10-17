@@ -186,8 +186,7 @@ impl OrderApi for Client {
     let order_update_request_params = OrderUpdateRequestParams {
       order_id: order.id,
       buyer_accepts_marketing: update_params
-        .buyer_accepts_marketing
-        .unwrap_or(order.buyer_accepts_marketing),
+        .buyer_accepts_marketing,
       email: update_params.email,
       phone: update_params.phone,
       note: update_params.note,
