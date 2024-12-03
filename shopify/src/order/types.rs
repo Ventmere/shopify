@@ -216,7 +216,7 @@ pub struct Order {
   pub tax_lines: Vec<TaxLines>,
   pub tags: String,
   pub contact_email: Option<String>,
-  pub order_status_url: String,
+  pub order_status_url: Option<String>,
   pub line_items: Vec<LineItems>,
   pub shipping_lines: Vec<ShippingLines>,
   pub billing_address: Option<Address>,
